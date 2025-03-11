@@ -273,7 +273,7 @@ def detect_chess_piece(image_path):
 
 
 if __name__ == "__main__":
-    img_path = "empty2.png"
+    img_path = "pieces/empty2.png"
     img = cv2.imread(img_path)
     #cv2.imshow("original", img)
     #det = detect_contours2(img_path)
