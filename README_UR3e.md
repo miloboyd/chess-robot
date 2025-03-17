@@ -9,15 +9,12 @@ This guide explains how to set up and control a Universal Robots UR3e using ROS 
 
 ## 1. Install Required Packages
 
-First, install all necessary ROS 2 packages:
-
+Install the necessary packages from the provided links:
 ```bash
-sudo apt update
-sudo apt install -y \
-  ros-humble-ur-robot-driver \
-  ros-humble-ur-description \
-  ros-humble-ur-moveit-config \
-  ros-humble-moveit
+https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver
+https://github.com/UniversalRobots/Universal_Robots_ROS2_GZ_Simulation
+https://moveit.picknik.ai/humble/doc/tutorials/getting_started/getting_started.html
+https://github.com/ros-controls/gz_ros2_control/tree/humble
 ```
 
 ## 2. Set up Workspaces
