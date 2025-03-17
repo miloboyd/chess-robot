@@ -27,7 +27,7 @@ mkdir -p ~/ur_ws/src
 
 # Clone the repositories
 cd ~/ur_ws/src
-git clone -b humble https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver.git
+git clone .... provided links above
 
 # Build the workspace
 cd ~/ur_ws
@@ -37,22 +37,6 @@ colcon build
 source install/setup.bash
 ```
 
-### (Optional) Set up MoveIt Workspace if not using apt-installed version
-
-If you need the latest MoveIt features, you can build it from source:
-
-```bash
-mkdir -p ~/ws_moveit2/src
-cd ~/ws_moveit2/src
-git clone -b humble https://github.com/ros-planning/moveit2.git
-git clone -b humble https://github.com/ros-planning/moveit_msgs.git
-git clone -b humble https://github.com/ros-planning/srdfdom.git
-
-cd ~/ws_moveit2
-rosdep install -y --from-paths src --ignore-src --rosdistro humble
-colcon build
-source install/setup.bash
-```
 
 ## 3. Connect to a Real UR3e Robot
 
@@ -72,17 +56,15 @@ Replace `192.168.0.250` with your robot's actual IP address.
 In a new terminal:
 
 ```bash
-source ~/ur_ws/install/setup.bash
 ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168.0.250
 ```
 
-## 4. Simulation (Optional)
+## 4. Simulation
 
 If you want to test without a real robot, you can use Gazebo simulation:
 
 ```bash
-# Install simulation packages
-sudo apt install -y ros-humble-gazebo-ros-pkgs
+# Install simulation packages above
 
 # Clone simulation repository
 cd ~/ur_ws/src
@@ -94,7 +76,7 @@ colcon build
 source install/setup.bash
 
 # Launch simulation
-ros2 launch ur_simulation_gz ur_sim.launch.py ur_type:=ur3e
+ros2 launch ur_simulation_gz ur_sim_control.launch.py ur_type:=ur3e launch_rviz:=false
 ```
 
 Then launch MoveIt with the simulation flag:
@@ -112,50 +94,6 @@ ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e use_sim_time:=tru
 3. Click "Plan" to generate a motion plan
 4. Click "Execute" to move the robot
 
-### Using Command Line
-
-```bash
-# Launch command line interface
-ros2 run moveit_commander moveit_commander_cmdline.py
-
-# Inside the commander
-> use manipulator
-> current
-> go home
-> go pose 0.4 0.1 0.4 0 3.14 0
-```
-
-### Using Python Script
-
-Create a Python script (`move_ur3e.py`):
-
-```python
-#!/usr/bin/env python3
-import rclpy
-from moveit.py import MoveIt
-
-def main():
-    rclpy.init()
-    moveit = MoveIt(node_name="moveit_py")
-    manipulator = moveit.get_planning_group("manipulator")
-    
-    # Move to a specific pose
-    manipulator.set_pose_target([0.4, 0.1, 0.4, 0, 3.14, 0])
-    manipulator.plan_kinematic_path()
-    manipulator.execute()
-    
-    rclpy.shutdown()
-
-if __name__ == '__main__':
-    main()
-```
-
-Make it executable and run:
-
-```bash
-chmod +x move_ur3e.py
-./move_ur3e.py
-```
 
 ## 6. Useful Commands
 
