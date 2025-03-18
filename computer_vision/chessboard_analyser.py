@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def analyze_chessboard(image_path, auto_calib=True, corners=[]):
+def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     """
     Analyze a chessboard image and return a 2D array representing the board state.
     
@@ -179,13 +179,16 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[]):
                     cv2.FONT_HERSHEY_SIMPLEX, 1, colors[i], 2)
 
     # Display the warped chessboard with corner points
-    cv2.imshow("Corrected Chessboard with Corners", warped_with_points)
+    #cv2.imshow("Corrected Chessboard with Corners", warped_with_points)
     # Step 2: Divide the chessboard into 64 squares
     square_width = width // 8
     square_height = height // 8
     
     # Create a figure to display all squares
+    
     fig, axes = plt.subplots(8, 8, figsize=(15, 15))
+    if not DEBUG:
+        plt.close(fig)
     
     # Initialize the board representation
     board = np.zeros((8, 8), dtype=np.int8)
