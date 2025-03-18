@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import python_chess2 as chs
 
 def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     """
@@ -214,7 +215,7 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
                 if piece_color == "white":
                     board[row, col] = 1
                 else:  # piece_color == "black"
-                    board[row, col] = 2
+                    board[row, col] = -1
             
             # Display the square with its classification
             square_rgb = cv2.cvtColor(square, cv2.COLOR_BGR2RGB)
@@ -227,8 +228,8 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     
     # Display the final board state
     fig, ax = plt.subplots(figsize=(10, 10))
-    cmap = plt.cm.colors.ListedColormap(['white', 'lightgrey', 'darkgrey'])
-    bounds = [-0.5, 0.5, 1.5, 2.5]
+    cmap = plt.cm.colors.ListedColormap(['darkgrey','white', 'lightgrey', ])
+    bounds = [-1.5, -0.5, 0.5, 1.5]
     norm = plt.cm.colors.BoundaryNorm(bounds, cmap.N)
     ax.imshow(board, cmap=cmap, norm=norm)
     
@@ -431,13 +432,38 @@ def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     return np.array(points)
 
 if __name__ == "__main__":
+    analyzer = chs.ChessBoardAnalyzer()
     current_board = []
     corners = []
-    if not current_board:
-        current_board, corners  = analyze_chessboard("chessboards/screen1.png", auto_calib=False)
-        print(corners)
-          
-    # Replace with your image path
-    board_array = analyze_chessboard("chessboards/screen2.png", auto_calib=False, corners=corners)
-    print("Board representation (0=empty, 1=white, 2=black):")
-    print(board_array)
+    i = 1
+    while i ==1:
+        if current_board is None or len(current_board) == 0:
+            current_board, corners  = analyze_chessboard("chessboards/screen1.png", auto_calib=False)
+            print(current_board)
+        else:
+            board_array, _ = analyze_chessboard("chessboards/screen2.png", auto_calib=False, corners=corners)
+            #print("Board representation (0=empty, 1=white, 2=black):")
+
+            results = chs.analyze_binary_board_state(analyzer, board_array)
+
+            # Access the analysis results
+            if results["detected_move"]:
+                print(f"Move detected: {results['detected_move']}")
+            else:
+                print("No valid move detected")
+
+            # The PGN so far
+            print(results["pgn"])
+            i = 2
+
+        """
+        print(board_array)
+        change_squares = np.bitwise_xor(current_board, board_array)
+        print("changed squares \n", change_squares)
+        start_square = np.bitwise_and(current_board, change_squares)
+        print("start square \n", start_square)
+
+        new_occupied = np.bitwise_or(board_array, change_squares)
+        new_occupied = np.bitwise_xor(new_occupied, current_board)
+        print("end square \n", new_occupied)
+        """
