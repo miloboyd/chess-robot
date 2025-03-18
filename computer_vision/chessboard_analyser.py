@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-def analyze_chessboard(image_path):
+def analyze_chessboard(image_path, auto_calib=True, corners=[]):
     """
     Analyze a chessboard image and return a 2D array representing the board state.
     
@@ -18,37 +18,98 @@ def analyze_chessboard(image_path):
         raise ValueError(f"Could not read image at {image_path}")
     
   
-    cv2.imshow("Original Chessboard Image", img)  # Display the image in a window
+    #cv2.imshow("Original Chessboard Image", img)  # Display the image in a window
+# Initialize approx
+    approx = None
+    
+    if corners is not None and len(corners) > 0:
+        approx = corners
+    elif auto_calib == True:
+        # Step 1: Find the chessboard corners
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        
+        # Preprocessing to enhance the contrast of the chessboard
+        gray = cv2.GaussianBlur(gray, (5, 5), 0)
+        
+        # Use adaptive thresholding to handle different lighting conditions
+        thresh = cv2.adaptiveThreshold(
+            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+        )
 
-    # Step 1: Find the chessboard corners
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
-    # Preprocessing to enhance the contrast of the chessboard
-    gray = cv2.GaussianBlur(gray, (5, 5), 0)
-    
-    # Use adaptive thresholding to handle different lighting conditions
-    thresh = cv2.adaptiveThreshold(
-        gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
-    )
-    # Find contours
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
-    # Find the largest contour (assuming it's the chessboard)
-    board_contour = max(contours, key=cv2.contourArea)
-    
-    
+        cv2.imshow("binary", thresh)  # Display the image in a window
+        # Find contours
+        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        print("number of contours detected: ", len(contours))
+        # Debug: Show all contours
+        debug_contours = img.copy()
+        cv2.drawContours(debug_contours, contours, -1, (0, 255, 0), 2)
+        cv2.imshow("All Contours", debug_contours)
+
+        # Filter contours by size and position to exclude the image frame
+        filtered_contours = []
+        img_height, img_width = img.shape[:2]
+        img_area = img_height * img_width
+
+        for contour in contours:
+            # Get contour area
+            area = cv2.contourArea(contour)
+            
+            # Get contour bounding rectangle
+            x, y, w, h = cv2.boundingRect(contour)
+            
+            # Calculate how much of the image frame this contour covers
+            edge_contact = False
+            
+            # Check if the contour touches the image edges
+            if x <= 1 or y <= 1 or x + w >= img_width - 1 or y + h >= img_height - 1:
+                edge_contact = True
+            
+            # Calculate area ratio (contour area / image area)
+            area_ratio = area / img_area
+            
+            # Skip contours that are too small
+            if area < 1000:
+                continue
+                
+            # Skip the contour if it's too large (probably the frame) or touches the edges
+            if area_ratio > 0.8 or edge_contact:
+                continue
+                
+            # Add to filtered contours
+            filtered_contours.append(contour)
+
+        # Debug: Show filtered contours
+        debug_filtered = img.copy()
+        cv2.drawContours(debug_filtered, filtered_contours, -1, (0, 0, 255), 2)
+        cv2.imshow("Filtered Contours", debug_filtered)
+
+        # If no valid contours found, try different approach
+        if not filtered_contours:
+            print("No suitable contours found after filtering. Try adjusting parameters.")
+            # You could add fallback logic here
+        else:
+            # Find the largest of the filtered contours
+            board_contour = max(filtered_contours, key=cv2.contourArea)
+            
+            # Show the selected board contour
+            debug_board = img.copy()
+            cv2.drawContours(debug_board, [board_contour], -1, (255, 0, 0), 3)
+            cv2.imshow("Selected Board Contour", debug_board)
     # Get the corner points of the board
-    peri = cv2.arcLength(board_contour, True)
-    approx = cv2.approxPolyDP(board_contour, 0.02 * peri, True)
-    
-    # If we don't get exactly 4 corners, try to use the minimum area rectangle
-    if len(approx) != 4:
-        rect = cv2.minAreaRect(board_contour)
-        box = cv2.boxPoints(rect)
-        approx = np.int0(box)
-    
+        peri = cv2.arcLength(board_contour, True)
+        approx = cv2.approxPolyDP(board_contour, 0.02 * peri, True)
+
+        # If we don't get exactly 4 corners, try to use the minimum area rectangle
+        if len(approx) != 4:
+            rect = cv2.minAreaRect(board_contour)
+            box = cv2.boxPoints(rect)
+            approx = np.int0(box)
+    else:
+        approx = select_points(image_path)
+
+
     # Order the points [top-left, top-right, bottom-right, bottom-left]
-    pts = np.array([p[0] for p in approx], dtype=np.float32)
+    pts = np.array(approx, dtype=np.float32).reshape(-1, 2)
     s = pts.sum(axis=1)
     ordered_pts = np.zeros((4, 2), dtype=np.float32)
     ordered_pts[0] = pts[np.argmin(s)]  # Top-left
@@ -56,7 +117,27 @@ def analyze_chessboard(image_path):
     diff = np.diff(pts, axis=1)
     ordered_pts[1] = pts[np.argmin(diff)]  # Top-right
     ordered_pts[3] = pts[np.argmax(diff)]  # Bottom-left
-    
+
+    # Create a copy of the original image to draw points on
+    img_with_points = img.copy()
+
+    # Draw the corner points on the original image
+    colors = [(0, 0, 255),   # Red for top-left
+            (0, 255, 0),   # Green for top-right
+            (255, 0, 0),   # Blue for bottom-right
+            (255, 255, 0)] # Cyan for bottom-left
+
+    point_labels = ["TL", "TR", "BR", "BL"]
+
+    for i, point in enumerate(ordered_pts):
+        x, y = point.astype(int)
+        cv2.circle(img_with_points, (x, y), 10, colors[i], -1)
+        cv2.putText(img_with_points, point_labels[i], (x+10, y+10), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, colors[i], 2)
+
+    # Display the original image with corner points
+    cv2.imshow("Original with Corners", img_with_points)
+
     # Get width and height of the chessboard
     width = int(max(
         np.linalg.norm(ordered_pts[0] - ordered_pts[1]),
@@ -66,7 +147,7 @@ def analyze_chessboard(image_path):
         np.linalg.norm(ordered_pts[0] - ordered_pts[3]),
         np.linalg.norm(ordered_pts[1] - ordered_pts[2])
     ))
-    
+
     # Define the destination points for perspective transform
     dst = np.array([
         [0, 0],
@@ -74,15 +155,31 @@ def analyze_chessboard(image_path):
         [width - 1, height - 1],
         [0, height - 1]
     ], dtype=np.float32)
-    
+
     # Calculate the perspective transform matrix and apply it
     matrix = cv2.getPerspectiveTransform(ordered_pts, dst)
     warped = cv2.warpPerspective(img, matrix, (width, height))
-    
-    # Display the warped chessboard
-    
-    cv2.imshow("Corrected Chessboard Image", warped)  # Display the image in a window
 
+    # Create a copy of the warped image to draw points on
+    warped_with_points = warped.copy()
+
+    # Draw the corner points on the warped image
+    # Since we know exactly where these points should be after transformation
+    warped_corners = [
+        (0, 0),                  # Top-left
+        (width - 1, 0),          # Top-right
+        (width - 1, height - 1), # Bottom-right
+        (0, height - 1)          # Bottom-left
+    ]
+
+    for i, point in enumerate(warped_corners):
+        x, y = point
+        cv2.circle(warped_with_points, (x, y), 10, colors[i], -1)
+        cv2.putText(warped_with_points, point_labels[i], (x+10, y+10), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, colors[i], 2)
+
+    # Display the warped chessboard with corner points
+    cv2.imshow("Corrected Chessboard with Corners", warped_with_points)
     # Step 2: Divide the chessboard into 64 squares
     square_width = width // 8
     square_height = height // 8
@@ -159,7 +256,7 @@ def analyze_chessboard(image_path):
     plt.tight_layout()
     plt.show()
     
-    return board
+    return board, approx
 
 def detect_piece_and_color(square_image):
     """
@@ -197,7 +294,7 @@ def detect_piece_and_color(square_image):
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     # Filter contours by size
-    min_area = (width * height) * 0.05  # At least 5% of square
+    min_area = (width * height) * 0.15  # At least 5% of square
     max_area = (width * height) * 0.9   # At most 90% of square
     
     # Variable to store the largest valid contour
@@ -242,9 +339,102 @@ def detect_piece_and_color(square_image):
     
     return True, color
 
-# Example usage
+def select_points(image_path, num_points=4, max_height=900, max_width=1600):
+    """
+    Opens an image and allows the user to select points by clicking.
+    Resizes the image to fit on screen if necessary.
+    
+    Parameters:
+    image_path (str): Path to the image file
+    num_points (int): Number of points to select (default is 4)
+    max_height (int): Maximum height for display (default 900)
+    max_width (int): Maximum width for display (default 1600)
+    
+    Returns:
+    numpy.ndarray: Array of (x, y) coordinates of selected points in original image scale
+    """
+    # Read the image
+    img = cv2.imread(image_path)
+    if img is None:
+        print(f"Error: Could not read image at {image_path}")
+        return None
+    
+    # Get original dimensions
+    original_height, original_width = img.shape[:2]
+    
+    # Calculate scaling factor to fit on screen
+    scale_width = min(1.0, max_width / original_width)
+    scale_height = min(1.0, max_height / original_height)
+    scale = min(scale_width, scale_height)
+    
+    # Resize image if needed
+    if scale < 1.0:
+        new_width = int(original_width * scale)
+        new_height = int(original_height * scale)
+        img = cv2.resize(img, (new_width, new_height))
+        print(f"Image resized from {original_width}x{original_height} to {new_width}x{new_height}")
+    
+    # Make a copy of the image for drawing
+    img_copy = img.copy()
+    
+    # Flag to track if scaling was applied
+    scaled = scale < 1.0
+    
+    # List to store the selected points
+    points = []
+    
+    # Mouse callback function
+    def mouse_callback(event, x, y, flags, param):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            # Add the point to our list
+            points.append((x, y))
+            
+            # Draw a circle at the clicked position
+            cv2.circle(img_copy, (x, y), 5, (0, 255, 0), -1)
+            
+            # Display the point number
+            cv2.putText(img_copy, str(len(points)), (x+10, y-10), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+            
+            # Update the displayed image
+            cv2.imshow("Image", img_copy)
+            
+            # If we've collected all points, print them
+            if len(points) == num_points:
+                print(f"All {num_points} points selected: {points}")
+    
+    # Create a window and set the mouse callback
+    cv2.namedWindow("Image")
+    cv2.setMouseCallback("Image", mouse_callback)
+    
+    # Display the image
+    cv2.imshow("Image", img)
+    
+    # Wait until all points are selected or user presses ESC
+    while len(points) < num_points:
+        key = cv2.waitKey(1) & 0xFF
+        if key == 27:  # ESC key
+            break
+    
+    # Close all windows
+    cv2.destroyAllWindows()
+    
+    # If we scaled the image, convert points back to original scale
+    if scaled:
+        scale_factor = 1.0 / scale
+        original_points = [(int(x * scale_factor), int(y * scale_factor)) for x, y in points]
+        return np.array(original_points)
+    
+    return np.array(points)
+
 if __name__ == "__main__":
+    current_board = []
+    corners = []
+    if not current_board:
+        current_board, corners  = analyze_chessboard("chessboards/screen1.png", auto_calib=False)
+        print(corners)
+          
     # Replace with your image path
-    board_array = analyze_chessboard("chessboards/chesscom2.png")
+    board_array = analyze_chessboard("chessboards/screen2.png", auto_calib=False, corners=corners)
     print("Board representation (0=empty, 1=white, 2=black):")
     print(board_array)
