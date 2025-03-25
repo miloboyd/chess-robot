@@ -1,0 +1,19 @@
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:17:3:[m[K [01;31m[Kerror: [m[K‘[01m[KQApplication[m[K’ was not declared in this scope
+   17 |   [01;31m[KQApplication[m[K app(argc, argv);
+      |   [01;31m[K^~~~~~~~~~~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:20:3:[m[K [01;31m[Kerror: [m[K‘[01m[KUR3ControlGUI[m[K’ was not declared in this scope
+   20 |   [01;31m[KUR3ControlGUI[m[K gui(node);
+      |   [01;31m[K^~~~~~~~~~~~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:21:3:[m[K [01;31m[Kerror: [m[K‘[01m[Kgui[m[K’ was not declared in this scope
+   21 |   [01;31m[Kgui[m[K.show();
+      |   [01;31m[K^~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:27:16:[m[K [01;31m[Kerror: [m[K‘[01m[Kapp[m[K’ was not declared in this scope
+   27 |   int result = [01;31m[Kapp[m[K.exec();
+      |                [01;31m[K^~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/main.cpp:33:7:[m[K [01;31m[Kerror: [m[K‘[01m[KrosSpinThread[m[K’ was not declared in this scope
+   33 |   if ([01;31m[KrosSpinThread[m[K.joinable()) {
+      |       [01;31m[K^~~~~~~~~~~~~[m[K
+gmake[2]: *** [CMakeFiles/rs2.dir/build.make:90: CMakeFiles/rs2.dir/src/main.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

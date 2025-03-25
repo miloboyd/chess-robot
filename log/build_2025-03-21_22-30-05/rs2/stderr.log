@@ -1,0 +1,12 @@
+
+AutoMoc error
+-------------
+"SRC:/src/GUI/GUI.cpp"
+contains a "Q_OBJECT" macro, but does not include "GUI.moc"!
+Consider to
+  - add #include "GUI.moc"
+  - enable SKIP_AUTOMOC for this file
+
+gmake[2]: *** [CMakeFiles/rs2_autogen.dir/build.make:71: CMakeFiles/rs2_autogen] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:164: CMakeFiles/rs2_autogen.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
