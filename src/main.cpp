@@ -8,18 +8,18 @@
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<rclcpp::Node>("GUI");
+    auto gui_node = std::make_shared<rclcpp::Node>("GUI");
     
     // Initialize Qt
     QApplication app(argc, argv);
     
     // Create and show the GUI
-    GUI gui(node);
+    GUI gui(gui_node);
     gui.show();
     
     // Create an executor for ROS2
     rclcpp::executors::MultiThreadedExecutor executor;
-    executor.add_node(node);
+    executor.add_node(gui_node);
     
     // Spin in a separate thread
     std::thread rosSpinThread([&executor]() {

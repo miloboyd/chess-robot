@@ -1641,9 +1641,6 @@ CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QFont
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
 
 CMakeFiles/rs2.dir/src/main.cpp.o
  /home/ubuntu/git/rs2/src/main.cpp

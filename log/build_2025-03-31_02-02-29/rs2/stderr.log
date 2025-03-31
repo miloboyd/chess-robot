@@ -1,0 +1,8 @@
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::toggleEStop()[m[K’:
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:135:67:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K)[m[K’ token
+  135 | statusLabel->setText(estopActive ? "Emergency Stop Activated":[01;31m[K)[m[K;
+      |                                                               [01;31m[K^[m[K
+
+gmake[2]: *** [CMakeFiles/rs2.dir/build.make:104: CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2

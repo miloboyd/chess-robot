@@ -28,28 +28,21 @@ protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 
 private slots:
-    void sendJointPositions();
-    void homePosition();
-    void updateJointLabel(int joint, int value);
     void toggleEStop();
     void toggleTurn();
     
 private:
     void setupUI();
-    void createJointControl(QVBoxLayout *layout, int jointNum);
-    void connectSignals();
     void updateMasterControlStatus(bool active);
+    void updateStatus();
     
     // ROS2 node and publisher
     std::shared_ptr<rclcpp::Node> node_;
-    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float64MultiArray>> joint_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> estop_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> dms_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> turn_pub_;
     
-    // UI Components
-    QSlider *joint1Slider, *joint2Slider, *joint3Slider, *joint4Slider, *joint5Slider, *joint6Slider;
-    QLabel *joint1Label, *joint2Label, *joint3Label, *joint4Label, *joint5Label, *joint6Label;
+
     QLabel *statusLabel;
     
     // E-Stop components

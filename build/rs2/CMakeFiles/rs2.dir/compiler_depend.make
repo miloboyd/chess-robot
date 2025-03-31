@@ -1638,10 +1638,7 @@ CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o: ../../src/GUI/GUI.cpp \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
   /usr/include/x86_64-linux-gnu/qt5/QtGui/QFont \
-  /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h \
-  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h
+  /usr/include/x86_64-linux-gnu/qt5/QtGui/qfont.h
 
 CMakeFiles/rs2.dir/src/main.cpp.o: ../../src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -2454,10 +2451,6 @@ CMakeFiles/rs2.dir/src/main.cpp.o: ../../src/main.cpp \
 
 ../../src/main.cpp:
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer:
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QFont:
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h:
@@ -2785,8 +2778,6 @@ CMakeFiles/rs2.dir/src/main.cpp.o: ../../src/main.cpp \
 /opt/ros/humble/include/rclcpp/rclcpp/experimental/subscription_intra_process_buffer.hpp:
 
 /opt/ros/humble/include/rclcpp/rclcpp/experimental/buffers/buffer_implementation_base.hpp:
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h:
 
 /opt/ros/humble/include/rclcpp/rclcpp/experimental/subscription_intra_process.hpp:
 
