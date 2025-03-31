@@ -1,0 +1,66 @@
+[0.046s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/ubuntu/git/rs2 -DCMAKE_INSTALL_PREFIX=/home/ubuntu/git/rs2/install/rs2
+[0.515s] -- The C compiler identification is GNU 11.4.0
+[0.711s] -- The CXX compiler identification is GNU 11.4.0
+[0.779s] -- Detecting C compiler ABI info
+[0.997s] -- Detecting C compiler ABI info - done
+[0.997s] -- Check for working C compiler: /usr/bin/cc - skipped
+[1.009s] -- Detecting C compile features
+[1.009s] -- Detecting C compile features - done
+[1.026s] -- Detecting CXX compiler ABI info
+[1.278s] -- Detecting CXX compiler ABI info - done
+[1.278s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[1.281s] -- Detecting CXX compile features
+[1.282s] -- Detecting CXX compile features - done
+[1.298s] -- Found ament_cmake: 1.3.11 (/opt/ros/humble/share/ament_cmake/cmake)
+[1.612s] -- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter 
+[1.991s] -- Found rclcpp: 16.0.11 (/opt/ros/humble/share/rclcpp/cmake)
+[2.218s] -- Found rosidl_generator_c: 3.1.6 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[2.236s] -- Found rosidl_adapter: 3.1.6 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[2.292s] -- Found rosidl_generator_cpp: 3.1.6 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[2.326s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[2.392s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.614s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[2.627s] -- Found rmw_fastrtps_cpp: 6.2.7 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[2.877s] -- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+[2.943s] -- Found FastRTPS: /opt/ros/humble/include  
+[3.023s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[3.067s] -- Looking for pthread.h
+[3.285s] -- Looking for pthread.h - found
+[3.285s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+[3.519s] -- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+[3.520s] -- Found Threads: TRUE  
+[3.747s] -- Found rclcpp_components: 16.0.11 (/opt/ros/humble/share/rclcpp_components/cmake)
+[4.130s] -- Configuring done
+[4.211s] -- Generating done
+[4.232s] -- Build files have been written to: /home/ubuntu/git/rs2/build/rs2
+[4.275s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake /home/ubuntu/git/rs2 -DCMAKE_INSTALL_PREFIX=/home/ubuntu/git/rs2/install/rs2
+[4.279s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[4.453s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[5.713s] [ 20%] Built target rs2_autogen
+[5.782s] [ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/main.cpp.o[0m
+[5.792s] [ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o[0m
+[5.834s] [ 80%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[16.458s] [100%] [32m[1mLinking CXX executable rs2[0m
+[18.949s] [100%] Built target rs2
+[18.984s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[19.007s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2
+[19.029s] -- Install configuration: ""
+[19.033s] -- Installing: /home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2
+[19.044s] -- Set runtime path of "/home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2" to ""
+[19.045s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/include/rs2
+[19.045s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/package_run_dependencies/rs2
+[19.045s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/parent_prefix_path/rs2
+[19.047s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.sh
+[19.047s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.dsv
+[19.047s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.sh
+[19.047s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.dsv
+[19.048s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.bash
+[19.048s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.sh
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.zsh
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.dsv
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.dsv
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/packages/rs2
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config.cmake
+[19.051s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config-version.cmake
+[19.051s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.xml
+[19.063s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2

@@ -7,6 +7,7 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/bool.hpp>
 
+
 // Forward declarations
 class QSlider;
 class QLabel;
@@ -31,6 +32,7 @@ private slots:
     void homePosition();
     void updateJointLabel(int joint, int value);
     void toggleEStop();
+    void toggleTurn();
     
 private:
     void setupUI();
@@ -42,6 +44,8 @@ private:
     std::shared_ptr<rclcpp::Node> node_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Float64MultiArray>> joint_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> estop_pub_;
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> dms_pub_;
+    std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> turn_pub_;
     
     // UI Components
     QSlider *joint1Slider, *joint2Slider, *joint3Slider, *joint4Slider, *joint5Slider, *joint6Slider;
@@ -58,6 +62,11 @@ private:
     QFrame *masterControlBar;
     QLabel *masterControlLabel;
     bool spacePressed;  // To track spacebar state
+    
+    // Turn control components
+    QPushButton *turnButton;
+    QFrame *turnIndicator;
+    bool isHumanTurn;
 };
 
 #endif // GUI_H

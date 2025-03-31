@@ -12,11 +12,12 @@
 #include <QFrame>
 #include <QKeyEvent>
 #include <QApplication>
+#include <QFont>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/bool.hpp>
 
 GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent) 
-    : QWidget(parent), node_(node), estopActive(false), spacePressed(false)
+    : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isHumanTurn(true)
 {
     // Create the publisher for joint positions
     joint_pub_ = node_->create_publisher<std_msgs::msg::Float64MultiArray>(
@@ -25,6 +26,12 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     // Create the publisher for e-stop status
     estop_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
         "ur3/estop", 10);
+
+    dms_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
+        "ur3/dms", 10);
+
+    turn_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
+        "ur3/turn", 10);
         
     // Set up the UI
     setupUI();
@@ -43,14 +50,16 @@ bool GUI::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Space && !spacePressed) {
+        if (keyEvent->key() == Qt::Key_Space && !keyEvent->isAutoRepeat() && !spacePressed) {
+            // Only process initial key press, ignore auto-repeats
             spacePressed = true;
             updateMasterControlStatus(true);
             return true; // Event handled
         }
     } else if (event->type() == QEvent::KeyRelease) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-        if (keyEvent->key() == Qt::Key_Space && spacePressed) {
+        if (keyEvent->key() == Qt::Key_Space && !keyEvent->isAutoRepeat() && spacePressed) {
+            // Only process actual key release, not auto-repeat releases
             spacePressed = false;
             updateMasterControlStatus(false);
             return true; // Event handled
@@ -63,12 +72,43 @@ bool GUI::eventFilter(QObject *obj, QEvent *event)
 
 void GUI::updateMasterControlStatus(bool active)
 {
-    if (active) {
+    if (active)  {
+        auto message = std_msgs::msg::Bool();
+        message.data = true;
+        dms_pub_->publish(message);
+
         masterControlBar->setStyleSheet("background-color: #4CAF50; border-radius: 5px;"); // Green
         masterControlLabel->setText("Robot Movement Master Control: ACTIVE");
+
     } else {
+        auto message = std_msgs::msg::Bool();
+        message.data = false;
+        dms_pub_->publish(message);
+
+
         masterControlBar->setStyleSheet("background-color: #F44336; border-radius: 5px;"); // Red
         masterControlLabel->setText("Robot Movement Master Control: INACTIVE (Hold Space)");
+    }
+}
+
+void GUI::toggleTurn()
+{
+    isHumanTurn = !isHumanTurn;
+    
+    if (isHumanTurn) {
+        auto message = std_msgs::msg::Bool();
+        message.data = true;
+        turn_pub_->publish(message);
+
+        turnButton->setText("Human Turn");
+        turnIndicator->setStyleSheet("background-color: #4CAF50; border: 2px solid #2E7D32; border-radius: 20px; opacity: 0.8;"); // Green with faded border
+    } else {
+        auto message = std_msgs::msg::Bool();
+        message.data = false;
+        turn_pub_->publish(message);
+
+        turnButton->setText("Robot Turn");
+        turnIndicator->setStyleSheet("background-color: #F44336; border: 2px solid #B71C1C; border-radius: 20px; opacity: 0.8;"); // Red with faded border
     }
 }
 
@@ -77,10 +117,10 @@ void GUI::toggleEStop()
     estopActive = !estopActive;
     
     if (estopActive) {
-        estopIndicator->setStyleSheet("background-color: #F44336; border-radius: 15px;"); // Red
+        estopIndicator->setStyleSheet("background-color: #F44336; border-radius: 20px;"); // Red
         estopLabel->setText("ESTOP ON");
     } else {
-        estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 15px;"); // Green
+        estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 20px;"); // Green
         estopLabel->setText("ESTOP OFF");
     }
     
@@ -95,6 +135,14 @@ void GUI::toggleEStop()
 
 void GUI::sendJointPositions()
 {
+    // Update position labels first
+    updateJointLabel(1, joint1Slider->value());
+    updateJointLabel(2, joint2Slider->value());
+    updateJointLabel(3, joint3Slider->value());
+    updateJointLabel(4, joint4Slider->value());
+    updateJointLabel(5, joint5Slider->value());
+    updateJointLabel(6, joint6Slider->value());
+    
     auto message = std_msgs::msg::Float64MultiArray();
     
     // Get values from sliders
@@ -187,28 +235,51 @@ void GUI::setupUI()
     mainLayout->addWidget(masterControlBar);
     mainLayout->addSpacing(10);
     
-    // E-Stop Control
-    QHBoxLayout *estopLayout = new QHBoxLayout();
+    // Control Buttons Row
+    QHBoxLayout *controlButtonsLayout = new QHBoxLayout();
     
-    // E-Stop Button
-    estopButton = new QPushButton("Toggle Emergency Stop");
-    estopLayout->addWidget(estopButton);
+    // E-Stop Button (Larger)
+    estopButton = new QPushButton("Emergency Stop");
+    estopButton->setMinimumHeight(60);
+    estopButton->setStyleSheet("background-color: #F44336; color: white; font-weight: bold; font-size: 16px; border-radius: 10px;");
     
     // E-Stop Indicator
     estopIndicator = new QFrame();
-    estopIndicator->setFixedSize(100, 30);
-    estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 15px;"); // Green initially
+    estopIndicator->setFixedSize(120, 40);
+    estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 20px;"); // Green initially
     
-    QHBoxLayout *indicatorLayout = new QHBoxLayout(estopIndicator);
+    QHBoxLayout *estopIndicatorLayout = new QHBoxLayout(estopIndicator);
     estopLabel = new QLabel("ESTOP OFF");
     estopLabel->setAlignment(Qt::AlignCenter);
     estopLabel->setStyleSheet("color: white; font-weight: bold;");
-    indicatorLayout->addWidget(estopLabel);
+    estopIndicatorLayout->addWidget(estopLabel);
     
-    estopLayout->addWidget(estopIndicator);
+    // Add E-Stop controls to their container
+    QVBoxLayout *estopContainerLayout = new QVBoxLayout();
+    estopContainerLayout->addWidget(estopButton);
+    estopContainerLayout->addWidget(estopIndicator, 0, Qt::AlignCenter);
     
-    mainLayout->addLayout(estopLayout);
-    mainLayout->addSpacing(10);
+    // Human/Robot Turn Button
+    turnButton = new QPushButton("Human Turn");
+    turnButton->setMinimumHeight(60);
+    turnButton->setStyleSheet("font-weight: bold; font-size: 14px;");
+    
+    // Turn Indicator
+    turnIndicator = new QFrame();
+    turnIndicator->setFixedSize(120, 40);
+    turnIndicator->setStyleSheet("background-color: #4CAF50; border: 2px solid #2E7D32; border-radius: 20px; opacity: 0.8;"); // Green with faded border initially
+    
+    // Add Turn controls to their container
+    QVBoxLayout *turnContainerLayout = new QVBoxLayout();
+    turnContainerLayout->addWidget(turnButton);
+    turnContainerLayout->addWidget(turnIndicator, 0, Qt::AlignCenter);
+    
+    // Add both control sets to the row
+    controlButtonsLayout->addLayout(estopContainerLayout);
+    controlButtonsLayout->addLayout(turnContainerLayout);
+    
+    mainLayout->addLayout(controlButtonsLayout);
+    mainLayout->addSpacing(15);
     
     // Joint Control Group
     QGroupBox *jointGroupBox = new QGroupBox("Joint Control");
@@ -230,16 +301,21 @@ void GUI::setupUI()
     
     // Home Button
     QPushButton *homeButton = new QPushButton("Home Position");
+    homeButton->setMinimumHeight(40);
     buttonLayout->addWidget(homeButton);
     
     // Send Button
     QPushButton *sendButton = new QPushButton("Send Joint Positions");
+    sendButton->setMinimumHeight(40);
+    sendButton->setStyleSheet("font-weight: bold;");
     buttonLayout->addWidget(sendButton);
     
     mainLayout->addLayout(buttonLayout);
     
     // Status Label
     statusLabel = new QLabel("Ready");
+    statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setStyleSheet("font-weight: bold; margin-top: 10px;");
     mainLayout->addWidget(statusLabel);
     
     // Set the main layout
@@ -249,10 +325,11 @@ void GUI::setupUI()
     connect(homeButton, &QPushButton::clicked, this, &GUI::homePosition);
     connect(sendButton, &QPushButton::clicked, this, &GUI::sendJointPositions);
     connect(estopButton, &QPushButton::clicked, this, &GUI::toggleEStop);
+    connect(turnButton, &QPushButton::clicked, this, &GUI::toggleTurn);
     
     // Set window properties
     setWindowTitle("UR3 Robot Control");
-    setMinimumSize(500, 600);
+    setMinimumSize(600, 700);
 }
 
 void GUI::createJointControl(QVBoxLayout *layout, int jointNum)
@@ -329,5 +406,3 @@ void GUI::connectSignals()
         this->updateJointLabel(6, value);
     });
 }
-
-// Include the MOC file to fix the vtable error
