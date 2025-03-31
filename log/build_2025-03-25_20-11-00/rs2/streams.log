@@ -1,0 +1,27 @@
+[0.042s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[0.257s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[0.346s] [ 20%] Built target rs2_autogen
+[0.398s] [35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[0.465s] [ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[6.266s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In constructor ‘[01m[KGUI::GUI(std::shared_ptr<rclcpp::Node>, QWidget*)[m[K’:
+[6.266s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:30:5:[m[K [01;31m[Kerror: [m[K‘[01m[Kdms_pub_[m[K’ was not declared in this scope
+[6.266s]    30 |     [01;31m[Kdms_pub_[m[K = node_->create_publisher<std_msgs::msg::Bool>(
+[6.266s]       |     [01;31m[K^~~~~~~~[m[K
+[6.275s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:33:5:[m[K [01;31m[Kerror: [m[K‘[01m[Kturn_pub_[m[K’ was not declared in this scope
+[6.276s]    33 |     [01;31m[Kturn_pub_[m[K = node_->create_publisher<std_msgs::msg::Bool>(
+[6.276s]       |     [01;31m[K^~~~~~~~~[m[K
+[6.287s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::updateMasterControlStatus(bool)[m[K’:
+[6.289s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:75:9:[m[K [01;31m[Kerror: [m[K‘[01m[Kmessage[m[K’ was not declared in this scope
+[6.289s]    75 |         [01;31m[Kmessage[m[K.data = true;
+[6.289s]       |         [01;31m[K^~~~~~~[m[K
+[6.291s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K At global scope:
+[6.291s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:81:7:[m[K [01;31m[Kerror: [m[Kexpected unqualified-id before ‘[01m[Kelse[m[K’
+[6.292s]    81 |     } [01;31m[Kelse[m[K {
+[6.292s]       |       [01;31m[K^~~~[m[K
+[6.292s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:90:1:[m[K [01;31m[Kerror: [m[Kexpected declaration before ‘[01m[K}[m[K’ token
+[6.292s]    90 | [01;31m[K}[m[K
+[6.292s]       | [01;31m[K^[m[K
+[8.057s] gmake[2]: *** [CMakeFiles/rs2.dir/build.make:104: CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o] Error 1
+[8.064s] gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+[8.065s] gmake: *** [Makefile:146: all] Error 2
+[8.090s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3

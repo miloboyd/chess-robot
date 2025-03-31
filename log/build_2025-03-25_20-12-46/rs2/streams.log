@@ -1,0 +1,31 @@
+[0.072s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[0.234s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[1.834s] [ 20%] Built target rs2_autogen
+[1.875s] [35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[1.943s] [ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[1.955s] [ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o[0m
+[1.961s] [ 80%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/main.cpp.o[0m
+[20.216s] [100%] [32m[1mLinking CXX executable rs2[0m
+[24.279s] [100%] Built target rs2
+[24.343s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[24.406s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2
+[24.439s] -- Install configuration: ""
+[24.448s] -- Installing: /home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2
+[24.454s] -- Set runtime path of "/home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2" to ""
+[24.466s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/include/rs2
+[24.474s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/package_run_dependencies/rs2
+[24.477s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/parent_prefix_path/rs2
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.sh
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.dsv
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.sh
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.dsv
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.bash
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.sh
+[24.488s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.zsh
+[24.489s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.dsv
+[24.489s] -- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.dsv
+[24.498s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/packages/rs2
+[24.498s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config.cmake
+[24.499s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config-version.cmake
+[24.500s] -- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.xml
+[24.516s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2

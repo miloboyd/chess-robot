@@ -1,0 +1,16 @@
+/home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2
+/home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/package_run_dependencies/rs2
+/home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/parent_prefix_path/rs2
+/home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.sh
+/home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.dsv
+/home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.sh
+/home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.dsv
+/home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.bash
+/home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.sh
+/home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.zsh
+/home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.dsv
+/home/ubuntu/git/rs2/install/rs2/share/rs2/package.dsv
+/home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/packages/rs2
+/home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config.cmake
+/home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config-version.cmake
+/home/ubuntu/git/rs2/install/rs2/share/rs2/package.xml

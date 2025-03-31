@@ -1,0 +1,5 @@
+[0.000000] (-) TimerEvent: {}
+[0.000357] (rs2) JobQueued: {'identifier': 'rs2', 'dependencies': OrderedDict()}
+[0.000853] (rs2) JobStarted: {'identifier': 'rs2'}
+[0.047358] (rs2) JobEnded: {'identifier': 'rs2', 'rc': 1}
+[0.065006] (-) EventReactorShutdown: {}
