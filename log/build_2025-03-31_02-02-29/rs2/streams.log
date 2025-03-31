@@ -1,0 +1,14 @@
+[0.036s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[0.237s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[0.378s] [ 20%] Built target rs2_autogen
+[0.453s] [35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[0.552s] [ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[6.661s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::toggleEStop()[m[K’:
+[6.661s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:135:67:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K)[m[K’ token
+[6.661s]   135 | statusLabel->setText(estopActive ? "Emergency Stop Activated":[01;31m[K)[m[K;
+[6.661s]       |                                                               [01;31m[K^[m[K
+[6.661s] 
+[8.496s] gmake[2]: *** [CMakeFiles/rs2.dir/build.make:104: CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o] Error 1
+[8.497s] gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+[8.498s] gmake: *** [Makefile:146: all] Error 2
+[8.506s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3

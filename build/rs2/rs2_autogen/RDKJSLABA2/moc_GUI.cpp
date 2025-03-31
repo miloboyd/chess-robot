@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_GUI_t {
-    QByteArrayData data[9];
-    char stringdata0[89];
+    QByteArrayData data[4];
+    char stringdata0[28];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,19 +33,12 @@ struct qt_meta_stringdata_GUI_t {
 static const qt_meta_stringdata_GUI_t qt_meta_stringdata_GUI = {
     {
 QT_MOC_LITERAL(0, 0, 3), // "GUI"
-QT_MOC_LITERAL(1, 4, 18), // "sendJointPositions"
-QT_MOC_LITERAL(2, 23, 0), // ""
-QT_MOC_LITERAL(3, 24, 12), // "homePosition"
-QT_MOC_LITERAL(4, 37, 16), // "updateJointLabel"
-QT_MOC_LITERAL(5, 54, 5), // "joint"
-QT_MOC_LITERAL(6, 60, 5), // "value"
-QT_MOC_LITERAL(7, 66, 11), // "toggleEStop"
-QT_MOC_LITERAL(8, 78, 10) // "toggleTurn"
+QT_MOC_LITERAL(1, 4, 11), // "toggleEStop"
+QT_MOC_LITERAL(2, 16, 0), // ""
+QT_MOC_LITERAL(3, 17, 10) // "toggleTurn"
 
     },
-    "GUI\0sendJointPositions\0\0homePosition\0"
-    "updateJointLabel\0joint\0value\0toggleEStop\0"
-    "toggleTurn"
+    "GUI\0toggleEStop\0\0toggleTurn"
 };
 #undef QT_MOC_LITERAL
 
@@ -55,7 +48,7 @@ static const uint qt_meta_data_GUI[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -63,16 +56,10 @@ static const uint qt_meta_data_GUI[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,   39,    2, 0x08 /* Private */,
-       3,    0,   40,    2, 0x08 /* Private */,
-       4,    2,   41,    2, 0x08 /* Private */,
-       7,    0,   46,    2, 0x08 /* Private */,
-       8,    0,   47,    2, 0x08 /* Private */,
+       1,    0,   24,    2, 0x08 /* Private */,
+       3,    0,   25,    2, 0x08 /* Private */,
 
  // slots: parameters
-    QMetaType::Void,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::Int, QMetaType::Int,    5,    6,
     QMetaType::Void,
     QMetaType::Void,
 
@@ -85,14 +72,12 @@ void GUI::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **
         auto *_t = static_cast<GUI *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->sendJointPositions(); break;
-        case 1: _t->homePosition(); break;
-        case 2: _t->updateJointLabel((*reinterpret_cast< int(*)>(_a[1])),(*reinterpret_cast< int(*)>(_a[2]))); break;
-        case 3: _t->toggleEStop(); break;
-        case 4: _t->toggleTurn(); break;
+        case 0: _t->toggleEStop(); break;
+        case 1: _t->toggleTurn(); break;
         default: ;
         }
     }
+    (void)_a;
 }
 
 QT_INIT_METAOBJECT const QMetaObject GUI::staticMetaObject = { {
@@ -124,13 +109,13 @@ int GUI::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 2;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 2)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 5;
+        _id -= 2;
     }
     return _id;
 }

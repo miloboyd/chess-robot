@@ -1,0 +1,4 @@
+Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2
+Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --install /home/ubuntu/git/rs2/build/rs2

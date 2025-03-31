@@ -1,0 +1,25 @@
+[0.032s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[0.176s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[1.163s] [ 20%] Built target rs2_autogen
+[1.202s] [35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[1.260s] [ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/main.cpp.o[0m
+[1.269s] [ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o[0m
+[1.273s] [ 80%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[9.234s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::toggleTurn()[m[K’:
+[9.382s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:109:19:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K;[m[K’ before ‘[01m[K}[m[K’ token
+[9.382s]   109 |     updateStatus()
+[9.382s]       |                   [01;31m[K^[m[K
+[9.383s]       |                   [32m[K;[m[K
+[9.383s]   110 | [32m[K}[m[K
+[9.383s]       | [32m[K~[m[K                  
+[9.384s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::toggleEStop()[m[K’:
+[9.384s] [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:133:19:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K;[m[K’ before ‘[01m[K}[m[K’ token
+[9.384s]   133 |     updateStatus()
+[9.385s]       |                   [01;31m[K^[m[K
+[9.385s]       |                   [32m[K;[m[K
+[9.385s]   134 | [32m[K}[m[K
+[9.385s]       | [32m[K~[m[K                  
+[11.551s] gmake[2]: *** [CMakeFiles/rs2.dir/build.make:104: CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o] Error 1
+[11.552s] gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+[11.557s] gmake: *** [Makefile:146: all] Error 2
+[11.617s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
