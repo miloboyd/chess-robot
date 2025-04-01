@@ -200,8 +200,9 @@ def detect_chess_piece(image_path):
     # Convert to grayscale
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    # Apply slight blur to reduce noise
+   # Apply Gaussian blur
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+   
     
     # Apply thresholding to separate piece from background
     thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
@@ -212,7 +213,7 @@ def detect_chess_piece(image_path):
     
     # Filter contours by size
     height, width = image.shape[:2]
-    min_area = (width * height) * 0.05  # At least 5% of image
+    min_area = (width * height) * 0.15  # At least 5% of image
     max_area = (width * height) * 0.95  # At most 95% of image
     
     piece_detected = False
@@ -273,7 +274,7 @@ def detect_chess_piece(image_path):
 
 
 if __name__ == "__main__":
-    img_path = "pieces/empty2.png"
+    img_path = "pawns/pawn.png"
     img = cv2.imread(img_path)
     #cv2.imshow("original", img)
     #det = detect_contours2(img_path)

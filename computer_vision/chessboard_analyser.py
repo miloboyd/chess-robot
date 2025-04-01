@@ -282,6 +282,7 @@ def detect_piece_and_color(square_image):
     
     # Apply Gaussian blur
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    #blurred = cv2.GaussianBlur(gray, (45, 45), 0)
     """
     # Use Canny edge detection
     edges = cv2.Canny(blurred, 50, 150)
@@ -293,7 +294,8 @@ def detect_piece_and_color(square_image):
   # Apply thresholding to separate piece from background
     thresh = cv2.adaptiveThreshold(blurred, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                   cv2.THRESH_BINARY_INV, 11, 2)
-
+  
+    
     # Find contours
     contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
@@ -431,7 +433,7 @@ def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     
     return np.array(points)
 
-if __name__ == "__main__":
+def main():
     analyzer = chs.ChessBoardAnalyzer()
     current_board = []
     corners = []
@@ -455,15 +457,23 @@ if __name__ == "__main__":
             # The PGN so far
             print(results["pgn"])
             i = 2
+def main2():
+    current_board, corners  = analyze_chessboard("chessboards/realphone1.jpg", auto_calib=False,DEBUG=True)
+    
 
-        """
-        print(board_array)
-        change_squares = np.bitwise_xor(current_board, board_array)
-        print("changed squares \n", change_squares)
-        start_square = np.bitwise_and(current_board, change_squares)
-        print("start square \n", start_square)
 
-        new_occupied = np.bitwise_or(board_array, change_squares)
-        new_occupied = np.bitwise_xor(new_occupied, current_board)
-        print("end square \n", new_occupied)
-        """
+
+if __name__ == "__main__":
+    main()
+    
+    """
+    print(board_array)
+    change_squares = np.bitwise_xor(current_board, board_array)
+    print("changed squares \n", change_squares)
+    start_square = np.bitwise_and(current_board, change_squares)
+    print("start square \n", start_square)
+
+    new_occupied = np.bitwise_or(board_array, change_squares)
+    new_occupied = np.bitwise_xor(new_occupied, current_board)
+    print("end square \n", new_occupied)
+    """
