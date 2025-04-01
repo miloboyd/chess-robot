@@ -1,0 +1,27 @@
+[ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[ 20%] Built target rs2_autogen
+[35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/main.cpp.o[0m
+[ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o[0m
+[ 80%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[100%] [32m[1mLinking CXX executable rs2[0m
+[100%] Built target rs2
+-- Install configuration: ""
+-- Installing: /home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2
+-- Set runtime path of "/home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2" to ""
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/include/rs2
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/package_run_dependencies/rs2
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/parent_prefix_path/rs2
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.sh
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.dsv
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.sh
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.dsv
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.bash
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.sh
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.zsh
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.dsv
+-- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.dsv
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/packages/rs2
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config.cmake
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config-version.cmake
+-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.xml

@@ -1,0 +1,6 @@
+/usr/bin/ld: CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o: in function `GUI::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)':
+mocs_compilation.cpp:(.text+0x66): undefined reference to `GUI::publishDifficulty()'
+collect2: error: ld returned 1 exit status
+gmake[2]: *** [CMakeFiles/rs2.dir/build.make:205: rs2] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
