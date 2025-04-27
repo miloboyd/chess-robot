@@ -4,8 +4,12 @@
 #include <array>
 #include <optional>
 #include <string>
+#include <iostream>
+#include <cctype>
+#include <utility>
 
 
+//give the player the first go
 
 /**
  * @class BoardPos
@@ -19,7 +23,7 @@ class BoardPos {
 public:
 
     //Constructor
-    BoardPos(bool isWhite);
+    BoardPos();
 
 private:
 
@@ -75,11 +79,17 @@ private:
     std::array<CapturedSquare, 16> whiteCapturedPieces;
     std::array<CapturedSquare, 16> blackCapturedPieces;
 
-    void placePieces(bool isWhite);
+    void placePieces();
     void initialiseBoard();
     void initialiseCapturedBoards();
-    bool movePiece(const std::string& source, const std::string& destination);
-    int notationToIndex(const std::string& notation);
-    bool isValidMove(int sourceIndex, int destinationIndex, const Piece& piece)
+    bool movePiece(const int source, const int destination);
+    std::pair<int, int> notationToIndex(const std::string& notation);
+    bool isValidMove(int sourceIndex, int destinationIndex, const Piece& piece);
+    bool isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece);
+    bool isStraightPathClear(int sourceIndex, int destinationIndex);
+    bool isDiagonalPathClear(int sourceIndex, int destinationIndex);
+    std::string getPieceTypeString(PieceType type);
+    std::string getSquareNotation(int index);
+    bool moveToCapturedBoard(const Piece& piece, bool isWhitePiece);
 
 };
