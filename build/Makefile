@@ -57,13 +57,23 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/milo/git/rs2/robot_manipulation
+CMAKE_SOURCE_DIR = /home/ubuntu/git/rs2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/milo/git/rs2/robot_manipulation/build
+CMAKE_BINARY_DIR = /home/ubuntu/git/rs2/build
 
 #=============================================================================
 # Targets provided globally by CMake.
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+.PHONY : test/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -85,11 +95,56 @@ rebuild_cache:
 rebuild_cache/fast: rebuild_cache
 .PHONY : rebuild_cache/fast
 
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+.PHONY : list_install_components/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
+
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/milo/git/rs2/robot_manipulation/build/CMakeFiles /home/milo/git/rs2/robot_manipulation/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntu/git/rs2/build/CMakeFiles /home/ubuntu/git/rs2/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/milo/git/rs2/robot_manipulation/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/ubuntu/git/rs2/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -116,6 +171,130 @@ depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
+#=============================================================================
+# Target rules for targets named uninstall
+
+# Build rule for target.
+uninstall: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 uninstall
+.PHONY : uninstall
+
+# fast build rule for target.
+uninstall/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/uninstall.dir/build.make CMakeFiles/uninstall.dir/build
+.PHONY : uninstall/fast
+
+#=============================================================================
+# Target rules for targets named rs2_uninstall
+
+# Build rule for target.
+rs2_uninstall: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs2_uninstall
+.PHONY : rs2_uninstall
+
+# fast build rule for target.
+rs2_uninstall/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2_uninstall.dir/build.make CMakeFiles/rs2_uninstall.dir/build
+.PHONY : rs2_uninstall/fast
+
+#=============================================================================
+# Target rules for targets named rs2
+
+# Build rule for target.
+rs2: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs2
+.PHONY : rs2
+
+# fast build rule for target.
+rs2/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/build
+.PHONY : rs2/fast
+
+#=============================================================================
+# Target rules for targets named rs2_autogen
+
+# Build rule for target.
+rs2_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs2_autogen
+.PHONY : rs2_autogen
+
+# fast build rule for target.
+rs2_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2_autogen.dir/build.make CMakeFiles/rs2_autogen.dir/build
+.PHONY : rs2_autogen/fast
+
+rs2_autogen/mocs_compilation.o: rs2_autogen/mocs_compilation.cpp.o
+.PHONY : rs2_autogen/mocs_compilation.o
+
+# target to build an object file
+rs2_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o
+.PHONY : rs2_autogen/mocs_compilation.cpp.o
+
+rs2_autogen/mocs_compilation.i: rs2_autogen/mocs_compilation.cpp.i
+.PHONY : rs2_autogen/mocs_compilation.i
+
+# target to preprocess a source file
+rs2_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.i
+.PHONY : rs2_autogen/mocs_compilation.cpp.i
+
+rs2_autogen/mocs_compilation.s: rs2_autogen/mocs_compilation.cpp.s
+.PHONY : rs2_autogen/mocs_compilation.s
+
+# target to generate assembly for a file
+rs2_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.s
+.PHONY : rs2_autogen/mocs_compilation.cpp.s
+
+src/GUI/GUI.o: src/GUI/GUI.cpp.o
+.PHONY : src/GUI/GUI.o
+
+# target to build an object file
+src/GUI/GUI.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o
+.PHONY : src/GUI/GUI.cpp.o
+
+src/GUI/GUI.i: src/GUI/GUI.cpp.i
+.PHONY : src/GUI/GUI.i
+
+# target to preprocess a source file
+src/GUI/GUI.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.i
+.PHONY : src/GUI/GUI.cpp.i
+
+src/GUI/GUI.s: src/GUI/GUI.cpp.s
+.PHONY : src/GUI/GUI.s
+
+# target to generate assembly for a file
+src/GUI/GUI.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.s
+.PHONY : src/GUI/GUI.cpp.s
+
+src/main.o: src/main.cpp.o
+.PHONY : src/main.o
+
+# target to build an object file
+src/main.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.o
+.PHONY : src/main.cpp.o
+
+src/main.i: src/main.cpp.i
+.PHONY : src/main.i
+
+# target to preprocess a source file
+src/main.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.i
+.PHONY : src/main.cpp.i
+
+src/main.s: src/main.cpp.s
+.PHONY : src/main.s
+
+# target to generate assembly for a file
+src/main.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.s
+.PHONY : src/main.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -123,7 +302,25 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
 	@echo "... rebuild_cache"
+	@echo "... test"
+	@echo "... rs2_autogen"
+	@echo "... rs2_uninstall"
+	@echo "... uninstall"
+	@echo "... rs2"
+	@echo "... rs2_autogen/mocs_compilation.o"
+	@echo "... rs2_autogen/mocs_compilation.i"
+	@echo "... rs2_autogen/mocs_compilation.s"
+	@echo "... src/GUI/GUI.o"
+	@echo "... src/GUI/GUI.i"
+	@echo "... src/GUI/GUI.s"
+	@echo "... src/main.o"
+	@echo "... src/main.i"
+	@echo "... src/main.s"
 .PHONY : help
 
 

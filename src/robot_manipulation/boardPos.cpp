@@ -1,69 +1,14 @@
 #include "boardPos.h"
 
-class BoardPos {
-public:
     // Constructor
-    BoardPos() {
+    BoardPos::BoardPos() {
         initialiseBoard();
         placePieces();
         initialiseCapturedBoards();
     }
 
-private:
-    enum class Color {
-        WHITE,
-        BLACK
-    };
 
-    enum class PieceType {
-        PAWN,
-        ROOK,
-        KNIGHT,
-        BISHOP,
-        QUEEN,
-        KING
-    };
-
-    struct Position3D {
-        double x;
-        double y;
-        double z;
-    };
-
-    struct Piece {
-        Color color;
-        PieceType type;
-    };
-
-    enum class GridID {
-        A1, A2, A3, A4, A5, A6, A7, A8,
-        B1, B2, B3, B4, B5, B6, B7, B8,
-        C1, C2, C3, C4, C5, C6, C7, C8,
-        D1, D2, D3, D4, D5, D6, D7, D8,
-        E1, E2, E3, E4, E5, E6, E7, E8,
-        F1, F2, F3, F4, F5, F6, F7, F8,
-        G1, G2, G3, G4, G5, G6, G7, G8,
-        H1, H2, H3, H4, H5, H6, H7, H8
-    };
-
-    struct Square {
-        Position3D position;
-        std::optional<Piece> piece; // Using optional to represent empty squares
-        GridID gridID;
-    };
-
-    struct CapturedSquare {
-        Position3D position;
-        std::optional<Piece> piece; // Using optional to represent empty positions
-        GridID gridID;
-    };
-
-    //INITIALISE BOARD ARRAYS 
-    std::array<Square, 64> board; // 8x8 board flattened to 1D array
-    std::array<CapturedSquare, 16> whiteCapturedPieces;
-    std::array<CapturedSquare, 16> blackCapturedPieces;
-
-    void initialiseBoard() {
+    void BoardPos::initialiseBoard() {
         for (int i = 0; i < 64; i++) {
             int row = i / 8;
             int col = i % 8;
@@ -77,7 +22,7 @@ private:
         }
     }
 
-    void initialiseCapturedBoards() {
+    void BoardPos::initialiseCapturedBoards() {
         for (int i = 0; i < 16; i++) {
 
             int row = i / 8;
@@ -99,7 +44,7 @@ private:
     }
 
     // Place pieces according to initial chess setup
-    void placePieces() {
+    void BoardPos::placePieces() {
 
         // Define piece layouts for both colors
         const PieceType backRowWhite[8] = {
@@ -126,9 +71,10 @@ private:
     // Middle rows (2-5) remain empty (nullopt)
     }
     
-public:
-    
-    bool movePiece(const int source, const int destination) {  
+    bool BoardPos::movePiece(const std::string& notation) {  
+        std::pair<int, int> coordinates = notationToIndex(notation);
+        int source = coordinates.first;
+        int destination = coordinates.second;
         
         if (source < 0 || source >= 64 || destination < 0 || destination >= 64) {
             std::cout << "Error: Source or destination index out of range" << std::endl;
@@ -194,7 +140,7 @@ public:
 
     }
 
-    std::pair<int, int> notationToIndex(const std::string notation) {  
+    std::pair<int, int> BoardPos::notationToIndex(const std::string& notation) {  
 
         if (notation.length() != 4) {
             throw std::invalid_argument("Input must be 4 characters long"); //e4g5
@@ -221,7 +167,7 @@ public:
         return {sourceIndex, destinationIndex};
     }
 
-    bool isValidMove(int sourceIndex, int destinationIndex, const Piece& piece) {
+    bool BoardPos::isValidMove(int sourceIndex, int destinationIndex, const Piece& piece) {
         
         //turn 1D indices into 2D coordinates
         int sourceRow = sourceIndex / 8;
@@ -381,14 +327,13 @@ public:
             return false;
             
         }
-        }
     }   
 
-    bool isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece) {
+    bool BoardPos::isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece) {
         return false;
     }
 
-    bool isStraightPathClear(int sourceIndex, int destinationIndex) {
+    bool BoardPos::isStraightPathClear(int sourceIndex, int destinationIndex) {
         std::cout << "Checking straight path clearance..." << std::endl;
         
         int sourceRow = sourceIndex / 8;
@@ -429,7 +374,7 @@ public:
         return true;
     }
 
-    bool isDiagonalPathClear(int sourceIndex, int destinationIndex) {
+    bool BoardPos::isDiagonalPathClear(int sourceIndex, int destinationIndex) {
         std::cout << "Checking diagonal path clearance..." << std::endl;
         
         int sourceRow = sourceIndex / 8;
@@ -478,7 +423,7 @@ public:
     }
 
     // Helper function to convert piece type to string for debug output
-    std::string getPieceTypeString(PieceType type) {
+    std::string BoardPos::getPieceTypeString(PieceType type) {
         switch (type) {
             case PieceType::PAWN: return "Pawn";
             case PieceType::ROOK: return "Rook";
@@ -491,7 +436,7 @@ public:
     }
     
     // Helper function to convert board index to algebraic notation (e.g., A1, C4)
-    std::string getSquareNotation(int index) {
+    std::string BoardPos::getSquareNotation(int index) {
         int row = index / 8;
         int col = index % 8;
         char file = 'A' + col;
@@ -499,7 +444,7 @@ public:
         return std::string(1, file) + std::string(1, rank);
     }
 
-    bool moveToCapturedBoard(const Piece& piece) {
+    bool BoardPos::moveToCapturedBoard(const Piece& piece) {
         
         // Find the first empty slot in the captured board
         for (int i = 0; i < whiteCapturedPieces.size(); i++) {
@@ -515,21 +460,22 @@ public:
         std::cout << "Warning: No empty slot found in captured board!" << std::endl;
         return false;
     }
-}
 
-    /** 
-    visualiseBoard {
+ 
+    void BoardPos::visualiseBoard() {
 
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
-    [ ][ ][ ][ ][ ][ ][ ][ ]
+        for (int i = 0; i < 64; i++) {
+            if (board[i].piece.has_value()) {
+                std::cout << static_cast<int>(board[i].piece->type);
+                std::cout << " ";
+            } else {
+                std::cout << "None";
+            }
+            if (i+1 % 8 == 0) {
+                std::cout << '\n';
+            }
+
+        }
         
 
     }
-    */
-};

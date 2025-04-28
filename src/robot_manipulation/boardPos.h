@@ -24,6 +24,8 @@ public:
 
     //Constructor
     BoardPos();
+    bool movePiece(const std::string& notation);
+    void visualiseBoard();
 
 private:
 
@@ -82,7 +84,7 @@ private:
     void placePieces();
     void initialiseBoard();
     void initialiseCapturedBoards();
-    bool movePiece(const int source, const int destination);
+    
     std::pair<int, int> notationToIndex(const std::string& notation);
     bool isValidMove(int sourceIndex, int destinationIndex, const Piece& piece);
     bool isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece);
@@ -93,3 +95,5 @@ private:
     bool moveToCapturedBoard(const Piece& piece);
 
 };
+
+#endif // BOARD_POS_H

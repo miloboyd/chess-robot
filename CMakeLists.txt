@@ -29,6 +29,11 @@ add_executable(rs2
   src/GUI/GUI.cpp
 )
 
+add_executable(boardPos
+  src/robot_manipulation/boardPosTester.cpp
+  src/robot_manipulation/boardPos.cpp
+)
+
 # Include directories
 target_include_directories(rs2 PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -36,6 +41,12 @@ target_include_directories(rs2 PUBLIC
   $<INSTALL_INTERFACE:include>
   ${rclcpp_INCLUDE_DIRS}
   ${std_msgs_INCLUDE_DIRS}
+)
+
+target_include_directories(boardPos PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_include_directories(rs2 PRIVATE
@@ -49,6 +60,11 @@ ament_target_dependencies(rs2
   std_msgs
 )
 
+ament_target_dependencies(boardPos
+  rclcpp
+  std_msgs
+)
+
 target_link_libraries(rs2
   Qt5::Widgets
   Qt5::Core
@@ -58,6 +74,7 @@ target_link_libraries(rs2
 # Install targets
 install(TARGETS
   rs2
+  boardPos
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -65,13 +82,6 @@ install(TARGETS
 install(DIRECTORY
   include/
   DESTINATION include/${PROJECT_NAME}
-  OPTIONAL
-)
-
-# Install launch files if you have any
-install(DIRECTORY
-  launch
-  DESTINATION share/${PROJECT_NAME}
   OPTIONAL
 )
 

@@ -1,0 +1,16 @@
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K In member function ‘[01m[Kvoid GUI::setupStartScreen()[m[K’:
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:33:61:[m[K [01;31m[Kerror: [m[K‘[01m[KstartGUI[m[K’ is not a member of ‘[01m[KGUI[m[K’
+   33 |     connect(startButton, &QPushButton::clicked, this, &GUI::[01;31m[KstartGUI[m[K);
+      |                                                             [01;31m[K^~~~~~~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:[m[K At global scope:
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:36:6:[m[K [01;31m[Kerror: [m[Kno declaration matches ‘[01m[Kvoid GUI::startGUI()[m[K’
+   36 | void [01;31m[KGUI[m[K::startGUI()
+      |      [01;31m[K^~~[m[K
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:36:6:[m[K [01;36m[Knote: [m[Kno functions named ‘[01m[Kvoid GUI::startGUI()[m[K’
+In file included from [01m[K/home/ubuntu/git/rs2/src/GUI/GUI.cpp:1[m[K:
+[01m[K/home/ubuntu/git/rs2/src/GUI/GUI.h:19:7:[m[K [01;36m[Knote: [m[K‘[01m[Kclass GUI[m[K’ defined here
+   19 | class [01;36m[KGUI[m[K : public QWidget
+      |       [01;36m[K^~~[m[K
+gmake[2]: *** [CMakeFiles/rs2.dir/build.make:104: CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o] Error 1
+gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+gmake: *** [Makefile:146: all] Error 2
