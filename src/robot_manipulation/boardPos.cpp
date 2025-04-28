@@ -168,19 +168,12 @@ public:
             // Determine which captured board to use based on the captured piece's color
             if (capturedPiece.color == Color::WHITE) {
                 // Move to white captured board
-                moveToCapturedBoard(capturedPiece, true);
+                moveToCapturedBoard(capturedPiece);
                 // movementFunction(destination, whiteCapturedLocation); // Robot arm movement
                 std::cout << "Moving captured white piece to white captured board" << std::endl;
-            } else {
-                // Move to black captured board
-                moveToCapturedBoard(capturedPiece, false);
-                // movementFunction(destination, blackCapturedLocation); // Robot arm movement
-                std::cout << "Moving captured black piece to black captured board" << std::endl;
             }
         }
 
-        board[destination].piece = sourcePiece;
-        board[source].piece = std::nullopt;
 
         // Move the piece on the board state
         board[destination].piece = sourcePiece;
@@ -204,7 +197,7 @@ public:
     std::pair<int, int> notationToIndex(const std::string notation) {  
 
         if (notation.length() != 4) {
-            throw std::invalid_argument("Input must be 4 characters long");
+            throw std::invalid_argument("Input must be 4 characters long"); //e4g5
         }
 
         char sourceFile = toupper(notation[0]);
@@ -506,15 +499,13 @@ public:
         return std::string(1, file) + std::string(1, rank);
     }
 
-    bool moveToCapturedBoard(const Piece& piece, bool isWhitePiece) {
-        // Determine which captured board to use
-        auto& capturedBoard = isWhitePiece ? whiteCapturedPieces : blackCapturedPieces;
+    bool moveToCapturedBoard(const Piece& piece) {
         
         // Find the first empty slot in the captured board
-        for (int i = 0; i < capturedBoard.size(); i++) {
-            if (!capturedBoard[i].piece.has_value()) {
+        for (int i = 0; i < whiteCapturedPieces.size(); i++) {
+            if (!whiteCapturedPieces[i].piece.has_value()) {
                 // Place the captured piece in this slot
-                capturedBoard[i].piece = piece;
+                whiteCapturedPieces[i].piece = piece;
                 std::cout << "Piece placed in captured board at position " << i << std::endl;
                 return true;
             }

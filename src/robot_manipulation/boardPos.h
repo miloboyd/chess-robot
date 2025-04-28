@@ -90,6 +90,6 @@ private:
     bool isDiagonalPathClear(int sourceIndex, int destinationIndex);
     std::string getPieceTypeString(PieceType type);
     std::string getSquareNotation(int index);
-    bool moveToCapturedBoard(const Piece& piece, bool isWhitePiece);
+    bool moveToCapturedBoard(const Piece& piece);
 
 };
