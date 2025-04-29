@@ -41,7 +41,7 @@ add_executable(boardPos
 )
 
 add_executable(ur3e_mtc_demo
-  src/ur3e_mtc_demo.cpp
+  src/robot_manipulation/ur3e_mtc_demo.cpp
 )
 
 # Include directories
