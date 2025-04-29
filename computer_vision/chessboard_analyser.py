@@ -223,8 +223,8 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
             axes[row, col].set_title(f"{'Empty' if not is_piece else piece_color}", fontsize=8)
             axes[row, col].axis('off')
     
-    #plt.tight_layout()
-    #plt.show()
+    plt.tight_layout()
+    plt.show()
     
     # Display the final board state
     fig, ax = plt.subplots(figsize=(10, 10))
