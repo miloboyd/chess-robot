@@ -433,17 +433,18 @@ def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     
     return np.array(points)
 
-def main():
-    analyzer = chs.ChessBoardAnalyzer()
+def main(img1, img2):
+    analyzer = chs.game()
     current_board = []
     corners = []
     i = 1
+    results = ""
     while i ==1:
         if current_board is None or len(current_board) == 0:
-            current_board, corners  = analyze_chessboard("chessboards/screen1.png", auto_calib=False)
+            current_board, corners  = analyze_chessboard(img1, auto_calib=False)
             print(current_board)
         else:
-            board_array, _ = analyze_chessboard("chessboards/screen2.png", auto_calib=False, corners=corners)
+            board_array, _ = analyze_chessboard(img2, auto_calib=False, corners=corners)
             #print("Board representation (0=empty, 1=white, 2=black):")
 
             results = chs.analyze_binary_board_state(analyzer, board_array)
@@ -457,6 +458,7 @@ def main():
             # The PGN so far
             print(results["pgn"])
             i = 2
+    return results['detected_move']
 def main2():
     current_board, corners  = analyze_chessboard("chessboards/realphone1.jpg", auto_calib=False,DEBUG=True)
     
@@ -464,7 +466,10 @@ def main2():
 
 
 if __name__ == "__main__":
-    main()
+    img1 = "chessboards/screen1.png"
+    img2 = "chessboards/screen2.png"
+    move = main(img1, img2)
+    print(move)
     
     """
     print(board_array)

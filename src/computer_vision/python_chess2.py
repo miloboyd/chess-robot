@@ -3,10 +3,10 @@ import chess
 import chess.pgn
 from typing import Tuple, Optional, List
 
-class ChessBoardAnalyzer:
+class game:
     def __init__(self, initial_fen=None):
         """
-        Initialize the ChessBoardAnalyzer
+        Initialize the game
         
         Args:
             initial_fen: Optional FEN string to set the initial board state
@@ -297,7 +297,7 @@ def analyze_binary_board_state(analyzer, new_board_array):
     and updates the chess board analyzer.
     
     Args:
-        analyzer (ChessBoardAnalyzer): An initialized ChessBoardAnalyzer object
+        analyzer (game): An initialized game object
         new_board_array (numpy.ndarray): 8x8 array with 0 (empty), 1 (white), -1 (black)
         
     Returns:
@@ -334,7 +334,7 @@ def analyze_binary_board_state(analyzer, new_board_array):
 # Example usage:
 def main():
     # Initialize the analyzer
-    analyzer = ChessBoardAnalyzer()
+    analyzer = game()
     
     print("---- Using color-only board representation ----")
     # Simulate a series of board states
@@ -376,7 +376,7 @@ def main():
     
     print("\n---- Example with auto turn inference ----")
     # Reset analyzer
-    analyzer2 = ChessBoardAnalyzer()
+    analyzer2 = game()
     
     # Create a new test board and make multiple moves
     test_board2 = chess.Board()
