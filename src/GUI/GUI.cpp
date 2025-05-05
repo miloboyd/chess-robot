@@ -30,6 +30,9 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     // publisher for the turn switch
     turn_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
         "ur3/turn", 10);
+
+    //initialise the start service
+    start_service_client_ = node_->create_client<std_srvs::srv::SetBool>("ur3/start_signal");
         
     // Set up the UI
     setupUI();
@@ -231,6 +234,35 @@ void GUI::setupUI()
     statusLabel->setStyleSheet("font-weight: bold; margin-top: 10px;");
     mainLayout->addWidget(statusLabel);
     
+    mainLayout->addSpacing(30);  // White space above the new elements
+
+    // Difficulty slider and label
+    QVBoxLayout *difficultyLayout = new QVBoxLayout();
+    difficultySlider = new QSlider(Qt::Horizontal);
+    difficultySlider->setRange(0, 5);  // 6 discrete steps (0-5)
+    difficultySlider->setTickInterval(1);
+    difficultySlider->setTickPosition(QSlider::TicksBelow);
+    difficultySlider->setSingleStep(1);
+    difficultySlider->setPageStep(1);
+    
+    difficultyLabel = new QLabel("Difficulty: 0");
+    difficultyLabel->setAlignment(Qt::AlignCenter);
+
+    difficultyLayout->addWidget(difficultySlider);
+    difficultyLayout->addWidget(difficultyLabel);
+
+    // Start button
+    startButton = new QPushButton("START");
+    startButton->setMinimumHeight(50);
+    startButton->setStyleSheet("font-weight: bold; font-size: 16px;");
+
+    // Bottom layout combining slider and button
+    QHBoxLayout *bottomLayout = new QHBoxLayout();
+    bottomLayout->addLayout(difficultyLayout);
+    bottomLayout->addWidget(startButton);
+    
+    mainLayout->addLayout(bottomLayout);
+
     // Set the main layout
     setLayout(mainLayout);
     
@@ -238,7 +270,33 @@ void GUI::setupUI()
     connect(estopButton, &QPushButton::clicked, this, &GUI::toggleEStop);
     connect(turnButton, &QPushButton::clicked, this, &GUI::toggleTurn);
     
+    connect(difficultySlider, &QSlider::valueChanged, this, [this](int value) {
+        difficultyLabel->setText(QString("Difficulty: %1").arg(value));
+    });
+
+    connect(startButton, &QPushButton::clicked, this, [this]() {
+        startButton->setEnabled(false);
+        difficultySlider->setEnabled(false);
+
+        if (!start_service_client_->wait_for_service(std::chrono::seconds(2))) {
+            RCLCPP_ERROR(node_->get_logger(), "Start service not available.");
+            return;
+        }
+
+        auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
+        request->data = true;  // Send "start" signal
+
+        start_service_client_->async_send_request(request,
+            [this](rclcpp::Client<std_srvs::srv::SetBool>::SharedFuture response) {
+                if (response.get()->success) {
+                    RCLCPP_INFO(node_->get_logger(), "Start acknowledged: %s", response.get()->message.c_str());
+                } else {
+                    RCLCPP_WARN(node_->get_logger(), "Start service call failed: %s", response.get()->message.c_str());
+                }
+            });
+    });
+    
     // Set window properties
     setWindowTitle("UR3 Robot Control");
-    setMinimumSize(600, 400);
+    setMinimumSize(800, 400);
 }
