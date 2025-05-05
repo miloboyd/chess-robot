@@ -6,6 +6,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_srvs/srv/set_bool.hpp>
 
 
 // Forward declarations
@@ -41,6 +42,7 @@ private:
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> estop_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> dms_pub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> turn_pub_;
+    rclcpp::Client<std_srvs::srv::SetBool>::SharedPtr start_service_client_;
     
 
     QLabel *statusLabel;
@@ -60,6 +62,13 @@ private:
     QPushButton *turnButton;
     QFrame *turnIndicator;
     bool isHumanTurn;
+
+    //Difficulty Slider
+    QSlider *difficultySlider;
+    QLabel *difficultyLabel;
+
+    //Start button
+    QPushButton *startButton;
 };
 
 #endif // GUI_H

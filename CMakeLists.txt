@@ -8,6 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 # Find executors
 find_package(rclcpp_components REQUIRED)
 
@@ -47,6 +48,7 @@ ament_target_dependencies(rs2
   rclcpp
   rclcpp_components
   std_msgs
+  std_srvs
 )
 
 target_link_libraries(rs2
