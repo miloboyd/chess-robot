@@ -25,6 +25,5 @@ Robot node requirements:
     it will then wait for a response in the /move_complete topic of true to indicate that the robot has stopped moving.
 
 Camera integration:
-
-    The camera has not been tested yet and therefore has not been fully integrated. I will include instructions on how to use it once it is tested.
+    the camera has not been tested yet and therefore has not been fully integrated. I will include instructions on how to use it once it is tested.
     Eventually it will be toggled on using a rosarg.
