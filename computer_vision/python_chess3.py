@@ -4,6 +4,7 @@ import chess.pgn
 from typing import Tuple, Optional, List
 import matplotlib.pyplot as plt
 import cv2
+import re
 
 class game:
     def __init__(self, initial_fen=None):
@@ -307,21 +308,30 @@ class game:
             
         Returns:
             dict: Analysis results containing:
-                - detected_move: The detected move in PGN notation
+                - detected_move: The detected move in SAN notation (e.g., 'e4')
                 - current_fen: The current FEN representation of the board
                 - board_array: The current board array after the move
                 - board_visual: ASCII visual representation of the board
                 - pgn: Current PGN of the game
         """
         # Update the board with the new state
-        detected_move = analyzer.update_board(new_board_array)
+        detected_move_pgn = analyzer.update_board(new_board_array)
+        
+        # Extract SAN move from PGN like "1. e4"
+        detected_move_san = None
+        if detected_move_pgn:
+            match = re.match(r"\d+\.\s*(\S+)", detected_move_pgn)
+            if match:
+                detected_move_san = match.group(1)
+            else:
+                detected_move_san = detected_move_pgn  # fallback
         
         # Create a visual representation of the board
         board_visual = str(analyzer.board)
         
         # Prepare results
         results = {
-            "detected_move": detected_move,
+            "detected_move": detected_move_san,
             "current_fen": analyzer.board.fen(),
             "board_array": analyzer.previous_board_array.copy(),
             "board_visual": board_visual,
@@ -329,7 +339,7 @@ class game:
         }
         
         # Print analysis summary
-        print(f"Detected move: {detected_move if detected_move else 'None'}")
+        print(f"Detected move: {detected_move_san if detected_move_san else 'None'}")
         print(f"Current FEN: {analyzer.board.fen()}")
         print(f"Current board state:")
         print(board_visual)

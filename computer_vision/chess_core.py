@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
 import numpy as np
 import matplotlib.pyplot as plt
-import python_chess3 as chs
+from computer_vision import python_chess3 as chs
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
@@ -11,6 +12,7 @@ from stockfish import Stockfish
 from std_msgs.msg import String, Bool
 import time
 import tkinter as tk
+import shutil
 
 
 class Chess_Core(Node):
@@ -26,17 +28,28 @@ class Chess_Core(Node):
 
         self.game = chs.game() #the actual chess game
         self.board = chs.chess.Board() #temporary board for checking stuff
-        self.current_board = []
+        self.current_board = [
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [-1, -1, -1, -1, -1, -1, -1, -1],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 0,  0,  0,  0,  0,  0,  0,  0],
+            [ 1,  1,  1,  1,  1,  1,  1,  1],
+            [ 1,  1,  1,  1,  1,  1,  1,  1]
+        ]
         self.corners = []
 
         self.turn = 0
-        self.turn_toggle = 0
+        self.turn_toggle = 1
         self.move_flag = 1 #used to check if the robot has completed its movement 1 means move complete
 
-        self.get_logger().info('Camera subscriber node started.')
+        
 
                 # Set the correct Stockfish binary path here
-        STOCKFISH_PATH = "/usr/games/stockfish"  # Change this based on your OS
+        #STOCKFISH_PATH = "/usr/games/stockfish"  # Change this based on your OS
+        STOCKFISH_PATH = shutil.which("stockfish")
+
 
         self.stockfish = Stockfish(STOCKFISH_PATH)
         self.stockfish.set_depth(18)  # Search depth (higher = stronger but slower)
@@ -45,6 +58,7 @@ class Chess_Core(Node):
             "Hash": 512,
             "Skill Level": 20  # 0 (weakest) to 20 (strongest)
         })
+        self.get_logger().info('Chess_core has launched sucessfully')
 
     def listener_callback(self, msg):
         try:
@@ -60,6 +74,7 @@ class Chess_Core(Node):
     def move_done_callback(self, msg):
         if msg.data:
             self.get_logger().info("Robot move confirmed complete.")
+            self.move_flag = 1
 
     def get_best_move(self, fen: str) -> str:
         """Takes a FEN string and returns the best move."""
@@ -94,7 +109,7 @@ class Chess_Core(Node):
                 board_array, _ = self.game.analyze_chessboard(self.current_img, auto_calib=False, corners=self.corners)
                 #print("Board representation (0=empty, 1=white, 2=black):")
 
-                results = self.game.analyze_binary_board_state(self.game, board_array)
+                results = self.game.analyze_binary_board_state(board_array)
 
                 # Access the analysis results
                 if results["detected_move"]:
@@ -115,27 +130,23 @@ class Chess_Core(Node):
         Returns:
             2d array of board position
         """
-        i = 1
+        
         results = ""
-        while i ==1:
-            if self.current_board is None or len(self.current_board) == 0:
-                self.current_board = self.manually_select_chess_pieces()
-                print(self.current_board)
-            else:
-                board_array = self.manually_select_chess_pieces()
-                #print("Board representation (0=empty, 1=white, -1=black):")
+        
+        board_array = self.manually_select_chess_pieces(self.current_board)
+        #print("Board representation (0=empty, 1=white, -1=black):")
 
-                results = self.game.analyze_binary_board_state(self.game, board_array)
+        results = self.game.analyze_binary_board_state(board_array)
 
-                # Access the analysis results
-                if results["detected_move"]:
-                    print(f"Move detected: {results['detected_move']}")
-                else:
-                    print("No valid move detected")
+        # Access the analysis results
+        if results["detected_move"]:
+            print(f"Move detected: {results['detected_move']}")
+        else:
+            print("No valid move detected")
 
-                # The PGN so far
-                print(results["pgn"])
-                i = 2
+        # The PGN so far
+        print(results["pgn"])
+                
         return results['detected_move']
 
     def update_board(self, move):
@@ -144,8 +155,11 @@ class Chess_Core(Node):
         @return if game is over
         """
         self.board.push_san(move)
-        board_array = self.game.board_to_colour_array(self.board)
+        board_array = self.game.board_to_color_array(self.board)
         move_made = self.game.update_board(board_array)
+        self.current_board = board_array.copy()
+        self.get_logger().info(f"new board state: {board_array}")
+        self.get_logger().info(f"move made: {move_made}")
         return self.game.board.is_game_over()
 
     def get_ai_move(self):
@@ -185,7 +199,9 @@ class Chess_Core(Node):
     def check_robot_completed(self):
         return self.move_flag
 
-    def manually_select_chess_pieces(self):
+    def manually_select_chess_pieces(self, initial_state=None):
+        
+
         board_size = 8
         cell_size = 60
         piece_states = [0, 1, -1]  # empty, white, black
@@ -194,7 +210,16 @@ class Chess_Core(Node):
         root = tk.Tk()
         root.title("Select Chess Pieces")
 
-        board_state = np.zeros((board_size, board_size), dtype=int)
+        if initial_state is not None:
+            initial_state = np.array(initial_state)  # ensure it's a NumPy array
+            if initial_state.shape == (8, 8):
+                board_state = initial_state.copy()
+            else:
+                board_state = np.zeros((board_size, board_size), dtype=int)
+        else:
+            board_state = np.zeros((board_size, board_size), dtype=int)
+
+
         buttons = [[None for _ in range(board_size)] for _ in range(board_size)]
 
         def cycle_state(i, j):
@@ -205,8 +230,13 @@ class Chess_Core(Node):
 
         for i in range(board_size):
             for j in range(board_size):
-                btn = tk.Button(root, bg=state_colors[0], width=4, height=2,
-                                command=lambda i=i, j=j: cycle_state(i, j))
+                btn = tk.Button(
+                    root,
+                    bg=state_colors[board_state[i, j]],
+                    width=4,
+                    height=2,
+                    command=lambda i=i, j=j: cycle_state(i, j)
+                )
                 btn.grid(row=i, column=j)
                 buttons[i][j] = btn
 
@@ -218,7 +248,7 @@ class Chess_Core(Node):
         finish_button.grid(row=board_size, column=0, columnspan=board_size, sticky="ew")
 
         root.mainloop()
-        return board_state   
+        return board_state
       
     def run_game(self):
         if self.turn == 0:  # player's turn
@@ -245,31 +275,41 @@ class Chess_Core(Node):
             return gameover
 
     def start_game(self):
+        self.get_logger().info('sim game started')
         run = True
         while run:
             run = not self.run_game()
 
     def run_game_simulated(self):
-        self.check_move() #to initialise board state
+        if self.current_board is None or len(self.current_board) == 0:
+                self.get_logger().info('Initialising Board')
+                self.current_board = self.manually_select_chess_pieces(self.current_board)
+                print(self.current_board)
+                
         if self.turn == 0:  # player's turn
-            print("Player's turn")
-            if self.turn_toggle == 1:
-                move = self.check_move_sim()
-                gameover = self.update_board(move)
-                self.turn = 1
-                self.turn_toggle = 0
-                return gameover
+            self.get_logger().info('Players Turn')
+            self.get_logger().info('Enter Players move')
+            move = self.check_move_sim()
+            self.get_logger().info('Updating Board')
+            gameover = self.update_board(move)
+            self.turn = 1
+            return gameover
 
         else:  # robot's turn
-            print("Robot's turn")
+            self.get_logger().info('Robots Turn')
+            self.get_logger().info('Getting AI Move')
             move = self.get_ai_move()
+            self.get_logger().info(f"sending move: {move}")
             self.send_move_to_robot(move)
 
             # ⏳ Wait until robot has completed the move
             while not self.check_robot_completed():
-                rclpy.spin_once(self, timeout_sec=0.1)
-
+                self.get_logger().info('Waiting for robot to complete move')
+                rclpy.spin_once(self, timeout_sec=0.5)
+            self.move_flag = 0 #reset move flag
+            self.get_logger().info('robot move complete, checking board state')
             move = self.check_move_sim()
+            self.get_logger().info('Updating Board')
             gameover = self.update_board(move)
             self.turn = 0
             return gameover
@@ -278,6 +318,7 @@ class Chess_Core(Node):
         run = True
         while run:
             run = not self.run_game_simulated()
+        self.get_logger().info('Game Complete')
 
 def main(args=None):
     rclpy.init(args=args)
