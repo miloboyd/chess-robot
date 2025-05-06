@@ -75,4 +75,12 @@ install(DIRECTORY
   OPTIONAL
 )
 
+ament_python_install_package(computer_vision)
+install(PROGRAMS
+  # This points to the Python entry point
+  computer_vision/chess_core.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 ament_package()
+
