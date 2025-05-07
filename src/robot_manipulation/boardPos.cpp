@@ -17,8 +17,6 @@
             board[i].position.x = (-150 + 18.75) + 37.5 * (row + 1); //150 constant to centre the board with robot positioning
             board[i].position.y = (50 + 18.75) + 37.5 * (col + 1); //50 constant to offer space between the robot and the board
             board[i].position.z = 10;
-            board[i].gridID = static_cast<GridID>(i);
-            board[i].piece = std::nullopt; // No piece on the square yet
         }
     }
 
@@ -31,14 +29,13 @@
             whiteCapturedPieces[i].position.x = (-150 - 70 - 75 + 18.75) + 37.5 * (i + 1);
             whiteCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (i + 1);
             whiteCapturedPieces[i].position.z = 10;
-            whiteCapturedPieces[i].gridID = static_cast<GridID>(i);
-            whiteCapturedPieces[i].piece = std::nullopt; // No piece on the square yet
+            whiteCapturedPiece[i].full = false;
 
             blackCapturedPieces[i].position.x = (150 + 70 + 18.75) + 37.5 * (i + 1);       
             blackCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (i + 1);
             blackCapturedPieces[i].position.z = 10;
-            blackCapturedPieces[i].gridID = static_cast<GridID>(i);
-            blackCapturedPieces[i].piece = std::nullopt; // No piece on the square yet
+            blackCapturedPieces[i].full = false;
+
         }
         
     }
@@ -61,6 +58,7 @@
             robot.moveRobot()
             
             //must keep record of whiteCapturedPieces grid
+            
             
             //when placing piece, add taken boolean 
             //iterate through whiteCapturedPieces to check for value
