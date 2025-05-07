@@ -24,9 +24,7 @@ public:
 
     //Constructor
     BoardPos();
-    bool movePiece(const std::string& notation);
-    void visualiseBoard();
-
+    bool movePiece(const std::string& start, const std::string& fnish, bool isTaken);
 private:
 
     enum class Color {
@@ -85,13 +83,7 @@ private:
     void initialiseBoard();
     void initialiseCapturedBoards();
     
-    std::pair<int, int> notationToIndex(const std::string& notation);
-    bool isValidMove(int sourceIndex, int destinationIndex, const Piece& piece);
     bool isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece);
-    bool isStraightPathClear(int sourceIndex, int destinationIndex);
-    bool isDiagonalPathClear(int sourceIndex, int destinationIndex);
-    std::string getPieceTypeString(PieceType type);
-    std::string getSquareNotation(int index);
     bool moveToCapturedBoard(const Piece& piece);
 
 };
