@@ -44,68 +44,51 @@
 
         int startIndex = chessNotationToIndex(start);
         int finishIndex = chessNotationToIndex(finish);
-        
+
+        robotControl robot;
+
         // Handle capturing opponent's piece
         if (isTaken == true) {
-            
+
             //move opponent piece to black captured piece
             std::cout << "Moving captured white piece to white captured board" << std::endl;
-            
-            robotControl robot;
+             
+            for (int i = 0; i < whiteCapturedPieces.size(); i++) {
+                if (whiteCapturedPieces[i].full == false) {
+                    whiteCapturedPieces[i].full = true;
+                    capturedIndex = i;
+                    std::cout << "Piece placed in captured board at position " << i << std::endl;
+                }
+            }
+            // If we reach here, there's no empty slot (shouldn't happen in a standard chess game)
+            std::cout << "Warning: No empty slot found in captured board!" << std::endl;
+            return false;
 
-            robot.moveRobot(board[startIndex].position.x, board[startIndex].position.y, board[startIndex].position.z + 2);
+            robot.moveRobot(board[finishIndex].position.x, board[finishIndex].position.y, board[finishIndex].position.z + 2);
             robot.pickUpPiece();
-            robot.moveRobot()
-            
-            //must keep record of whiteCapturedPieces grid
-            
-            
-            //when placing piece, add taken boolean 
-            //iterate through whiteCapturedPieces to check for value
-                //place piece, update grid to give taken value
+            robot.moveRobot(whiteCapturedPieces[capturedIndex].position.x, whiteCapturedPieces[capturedIndex].position.y, whiteCapturedPieces[capturedIndex].position.z + 2);
+            robot.placePiece();
         }
 
-        // Check for pawn promotion
-        /**        if (isPawnPromotion(source, destination, sourcePiece)) {
+        //Check for pawn promotion
+        if (isPawnPromotion(destinationIndex)) {
             // handlePawnPromotion(destination);
             std::cout << "Pawn promotion detected! (Implementation pending)" << std::endl;
-
             //when pulling piece, remove taken piece type 
         }
-        */
 
-
-        //move piece from start to finish coord
-        //std::cout << "Moving piece from" << grid.ID << "to" << grid.ID << std::endl;
-        //move robot()
+        robot.moveRobot(board[startIndex].position.x, board[startIndex].position.y, board[startIndex].position.z + 2);
+        robot.pickUpPiece();
+        robot.moveRobot(whiteCapturedPieces[finishIndex].position.x, whiteCapturedPieces[finishIndex].position.y, whiteCapturedPieces[finishIndex].position.z + 2);
+        robot.placePiece();
 
         return true;
 
-    }    
+    }   
 
-    bool BoardPos::isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece) {
-
-        //move captured 
+    bool BoardPos::isPawnPromotion(int destinationIndex) {
         return false;
 
-    }
-
-
-    bool BoardPos::moveToCapturedBoard(const Piece& piece) {
-        
-        // Find the first empty slot in the captured board
-        for (int i = 0; i < whiteCapturedPieces.size(); i++) {
-            if (!whiteCapturedPieces[i].piece.has_value()) {
-                // Place the captured piece in this slot
-                whiteCapturedPieces[i].piece = piece;
-                std::cout << "Piece placed in captured board at position " << i << std::endl;
-                return true;
-            }
-        }
-        
-        // If we reach here, there's no empty slot (shouldn't happen in a standard chess game)
-        std::cout << "Warning: No empty slot found in captured board!" << std::endl;
-        return false;
     }
 
     int chessNotationToIndex(const std::string& notation) {
