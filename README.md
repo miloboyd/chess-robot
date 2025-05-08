@@ -62,6 +62,14 @@ In a new terminal:
 ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168.0.250
 ```
 
+### Step 3: Execute the run file
+
+In another terminal:
+
+```bash
+ros2 ros2 run rs2 robotControl
+```
+
 ## 4. Simulation
 
 If you want to test without a real robot, you can use a fake hardware system:
@@ -76,7 +84,7 @@ source install/setup.bash
 # Launch simulation
 
 ```bash
-ros2 launch ur_simulation_gz ur_sim_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.250 launch_rviz:=false use_fake_hardware:=true
+ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.250 launch_rviz:=false use_fake_hardware:=true
 ```
 
 Then launch MoveIt with the simulation flag:
