@@ -3,10 +3,10 @@
 #include <thread>
 #include <chrono>
 
-class UR3eControl : public rclcpp::Node
+class RobotControl : public rclcpp::Node
 {
 public:
-  explicit UR3eControl() : Node("ur3e_control_node")
+  explicit RobotControl() : Node("ur3e_control_node")
   {
     RCLCPP_INFO(this->get_logger(), "Initializing UR3e Control Node");
     
@@ -107,7 +107,7 @@ public:
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<UR3eControl>();
+  auto node = std::make_shared<RobotControl>();
   
   // Run the demo
   node->run_demo();
