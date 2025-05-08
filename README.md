@@ -34,7 +34,7 @@ git clone .... provided links above
 
 # Build the workspace
 cd ~/ur_ws
-colcon build
+colcon build --symlink-install --packages-select rs2
 
 # Source the workspace
 source install/setup.bash
@@ -71,35 +71,21 @@ If you want to test without a real robot, you can use a fake hardware system:
 
 # build your workspace
 cd ~/ur_ws
-colcon build
+colcon build --symlink-install --packages-select rs2
 source install/setup.bash
-
 # Launch simulation
 
 ```bash
-ros2 launch ur_simulation_gz ur_sim_control.launch.py ur_type:=ur3e launch_rviz:=false use_fake_hardware:=true
+ros2 launch ur_simulation_gz ur_sim_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.250 launch_rviz:=false use_fake_hardware:=true
 ```
 
 Then launch MoveIt with the simulation flag:
 
 ```bash
-ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e
+ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168.0.250
 ```
 
-## 5. Manipulating RViz 
-
-First, make sure you've configured RViz with the Motion Planning Tasks panel and saved the configuration:
-
-change frame from "world" to "base_link"
-In the display, untick "moveit_visualisation"
-In RViz, click on "Add" in the bottom-left corner
-Search for "Motion Planning Tasks" under "moveit_task_constructor_visualization"
-Select it and click "OK"
-In the newly added panel, set the "Task Solution Topic" to "/solution"
-
-Alternatively, you can Click on "File" → "Open Config" → "mtc.rviz"
-
-## 6. Useful Commands
+## 5. Useful Commands
 
 ### Check Topic Information
 
@@ -124,7 +110,7 @@ ros2 control list_controllers
 ros2 topic echo /controller_manager/status
 ```
 
-## 7. Common Issues and Solutions
+## 6. Common Issues and Solutions
 
 ### Robot Not Connecting
 - Verify the robot IP address
@@ -140,7 +126,7 @@ ros2 topic echo /controller_manager/status
 - Confirm you specified the right `ur_type` parameter (ur3e)
 - Ensure MoveIt and the robot driver are correctly installed
 
-## 8. Additional Resources
+## 7. Additional Resources
 
 - [Universal Robots ROS2 Driver GitHub](https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver)
 - [MoveIt Documentation](https://moveit.picknik.ai/humble/index.html)
