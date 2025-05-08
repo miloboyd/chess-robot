@@ -36,12 +36,12 @@ add_executable(rs2
 )
 
 add_executable(boardPos
-  src/robot_manipulation/boardPosTester.cpp
+  src/robot_manipulation/boardTester.cpp
   src/robot_manipulation/boardPos.cpp
 )
 
-add_executable(ur3e_mtc_demo
-  src/robot_manipulation/ur3e_mtc_demo.cpp
+add_executable(robotControl
+  src/robot_manipulation/robotControl.cpp
 )
 
 # Include directories

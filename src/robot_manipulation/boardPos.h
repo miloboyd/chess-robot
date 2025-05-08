@@ -43,7 +43,7 @@ public:
      * @returns Boolean value on whether the operation was successful. 
      * @see robotControl, chessNotationToIndex, isPawnPromotion, placePieces.
      */
-    bool movePiece(const std::string& start, const std::string& fnish, bool isTaken);
+    bool movePiece(const std::string& start, const std::string& finish, bool isTaken);
 
 private:
 
