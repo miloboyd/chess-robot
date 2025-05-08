@@ -1,0 +1,14 @@
+# Build directories
+build/
+install/
+log/
+
+# Compiled files
+*.o
+*.so
+*.a
+*.pyc
+__pycache__/
+
+# ROS 2 specific
+.catkin_workspace
