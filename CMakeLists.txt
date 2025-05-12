@@ -28,6 +28,7 @@ set(CMAKE_AUTOUIC ON)
 add_executable(rs2
   src/main.cpp
   src/GUI/GUI.cpp
+  src/GUI/RobotNode.cpp
 )
 
 # Include directories

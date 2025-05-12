@@ -17,7 +17,7 @@
 #include <std_msgs/msg/bool.hpp>
 
 GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent) 
-    : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isHumanTurn(true)
+    : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isHumanTurn(true), difficulty_(0)
 {
     // Create the publisher for e-stop status
     estop_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
@@ -42,6 +42,8 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     
     // Install event filter on application to catch key events globally
     QApplication::instance()->installEventFilter(this);
+
+    RCLCPP_INFO(node_->get_logger(), "GUI initialized.");
 }
 
 bool GUI::eventFilter(QObject *obj, QEvent *event)
@@ -159,6 +161,12 @@ void GUI::updateStatus()
     } else {
         statusLabel->setText("Ready - Human turn");
     }
+}
+
+int GUI::getDifficulty() 
+{
+    std::lock_guard<std::mutex> lock(state_mutex_);
+    return difficulty_;
 }
 
 void GUI::setupUI()
@@ -293,6 +301,7 @@ void GUI::setupUI()
     
     connect(difficultySlider, &QSlider::valueChanged, this, [this](int value) {
         difficultyLabel->setText(QString("Difficulty: %1").arg(value));
+        difficulty_ = value;
     });
 
     connect(startButton, &QPushButton::clicked, this, [this]() {
