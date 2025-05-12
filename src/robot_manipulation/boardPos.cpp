@@ -3,22 +3,19 @@
     // Constructor
     BoardPos::BoardPos() {
         initialiseBoard();
-        placePieces();
         initialiseCapturedBoards();
     }
 
 
     void BoardPos::initialiseBoard() {
         for (int i = 0; i < 64; i++) {
-            int row = i / 8;
-            int col = i % 8;
+            int file = i / 8; //files are columns
+            int rank = i % 8; //ranks are rows 
 
             //18.75 constant to centre the pieces in the board grid
-            board[i].position.x = (-150 + 18.75) + 37.5 * (row + 1); //150 constant to centre the board with robot positioning
-            board[i].position.y = (50 + 18.75) + 37.5 * (col + 1); //50 constant to offer space between the robot and the board
+            board[i].position.x = (-150 + 18.75) + 37.5 * (file + 1); //150 constant to centre the board with robot positioning
+            board[i].position.y = (50 + 18.75) + 37.5 * (rank + 1); //50 constant to offer space between the robot and the board
             board[i].position.z = 10;
-            board[i].gridID = static_cast<GridID>(i);
-            board[i].piece = std::nullopt; // No piece on the square yet
         }
     }
 
@@ -28,454 +25,101 @@
             int row = i / 8;
             int col = i % 8;
 
-            whiteCapturedPieces[i].position.x = (-150 - 70 - 75 + 18.75) + 37.5 * (i + 1);
-            whiteCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (i + 1);
+            whiteCapturedPieces[i].position.x = (-150 - 70 - 75 + 18.75) + 37.5 * (col + 1);
+            whiteCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (row + 1);
             whiteCapturedPieces[i].position.z = 10;
-            whiteCapturedPieces[i].gridID = static_cast<GridID>(i);
-            whiteCapturedPieces[i].piece = std::nullopt; // No piece on the square yet
+            whiteCapturedPieces[i].full = false;
 
-            blackCapturedPieces[i].position.x = (150 + 70 + 18.75) + 37.5 * (i + 1);       
-            blackCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (i + 1);
+            blackCapturedPieces[i].position.x = (150 + 70 + 18.75) + 37.5 * (col + 1);       
+            blackCapturedPieces[i].position.y = (50 + 18.75) + 37.5 * (row + 1);
             blackCapturedPieces[i].position.z = 10;
-            blackCapturedPieces[i].gridID = static_cast<GridID>(i);
-            blackCapturedPieces[i].piece = std::nullopt; // No piece on the square yet
+            blackCapturedPieces[i].full = false;
+
         }
         
-    }
-
-    // Place pieces according to initial chess setup
-    void BoardPos::placePieces() {
-
-        // Define piece layouts for both colors
-        const PieceType backRowWhite[8] = {
-            PieceType::ROOK, PieceType::KNIGHT, PieceType::BISHOP, PieceType::KING,
-            PieceType::QUEEN, PieceType::BISHOP, PieceType::KNIGHT, PieceType::ROOK
-        };
-
-        // Setup pieces for white orientation
-        
-        // White pieces (bottom rows)
-        for (int col = 0; col < 8; col++) {
-
-            // Back row (index 56-63)
-            board[56 + col].piece = Piece{Color::WHITE, backRowWhite[col]};
-            // Pawns (row 48-55)
-            board[48 + col].piece = Piece{Color::WHITE, PieceType::PAWN};
-
-            //Black Pieces (top rows)
-            // Back row (index 0-7)
-            board[col].piece = Piece{Color::BLACK, backRowWhite[col]};
-            // Pawns (row 8-15)
-            board[8 + col].piece = Piece{Color::BLACK, PieceType::PAWN};
-        }
-    // Middle rows (2-5) remain empty (nullopt)
     }
     
-    bool BoardPos::movePiece(const std::string& notation) {  
-        std::pair<int, int> coordinates = notationToIndex(notation);
-        int source = coordinates.first;
-        int destination = coordinates.second;
-        
-        if (source < 0 || source >= 64 || destination < 0 || destination >= 64) {
-            std::cout << "Error: Source or destination index out of range" << std::endl;
-            throw std::out_of_range("Source or destination index out of range");
-        }
-
-        // Check if the source square has a piece
-        if (!board[source].piece) {
-            std::cout << "Error: No piece at source square" << std::endl;
-            throw std::invalid_argument("No piece at source square");
-        }
-
-        //Get the piece information
-        Piece sourcePiece = board[source].piece.value();
-
-        //isvalid move function make sure move is possible with the piece type
-        if (!isValidMove(source, destination, sourcePiece)) {
-            std::cout << "Error: Invalid move for the piece type" << std::endl;
-            throw std::invalid_argument("Invalid move for the piece type");
-        }
-        
-
-        //check if the destination square is occupied by an allied piece
-        if (board[destination].piece.has_value() && 
-            board[destination].piece->color == sourcePiece.color) {
-            std::cout << "Error: Cannot capture your own piece" << std::endl;
-            throw std::invalid_argument("Cannot capture your own piece");
-        }
-
+    bool BoardPos::movePiece(const std::string& start, const std::string& finish, bool isTaken) {  
+        int startIndex = chessNotationToIndex(start);
+        int finishIndex = chessNotationToIndex(finish);
 
         // Handle capturing opponent's piece
-        if (board[destination].piece.has_value()) {
-            Piece capturedPiece = board[destination].piece.value();
-            std::cout << "Capturing opponent's piece: " 
-                    << getPieceTypeString(capturedPiece.type) << std::endl;
+        if (isTaken == true) {
+
+            //move opponent piece to black captured piece
+            std::cout << "Moving captured white piece to white captured board" << std::endl;
             
-            // Determine which captured board to use based on the captured piece's color
-            if (capturedPiece.color == Color::WHITE) {
-                // Move to white captured board
-                moveToCapturedBoard(capturedPiece);
-                // movementFunction(destination, whiteCapturedLocation); // Robot arm movement
-                std::cout << "Moving captured white piece to white captured board" << std::endl;
+            int capturedIndex = -1;
+
+            for (int i = 0; i < whiteCapturedPieces.size(); i++) {
+                if (whiteCapturedPieces[i].full == false) {
+                    whiteCapturedPieces[i].full = true;
+                    capturedIndex = i;
+                    std::cout << "Piece placed in captured board at position " << i << std::endl;
+                    break;
+                }
             }
+
+            // Check if we found an empty slot 
+            if (capturedIndex == -1) {
+                std::cout << "Warning: No empty slot found in captured board!" << std::endl;
+                return false;
+            }
+
+            /*
+            robot.moveRobot(board[finishIndex].position.x, board[finishIndex].position.y, board[finishIndex].position.z + 2);
+            robot.pickUpPiece();
+            robot.moveRobot(whiteCapturedPieces[capturedIndex].position.x, whiteCapturedPieces[capturedIndex].position.y, whiteCapturedPieces[capturedIndex].position.z + 2);
+            robot.placePiece();
+            */
         }
 
-
-        // Move the piece on the board state
-        board[destination].piece = sourcePiece;
-        board[source].piece = std::nullopt;
-        
-        // Call robot arm movement function to execute the move
-        // movementFunction(source, destination); // Robot arm movement
-        std::cout << "Moving piece from " << getSquareNotation(source) 
-                << " to " << getSquareNotation(destination) << std::endl;
-
-        // Check for pawn promotion
-        if (isPawnPromotion(source, destination, sourcePiece)) {
+        //Check for pawn promotion
+        if (isPawnPromotion(finishIndex)) {
             // handlePawnPromotion(destination);
             std::cout << "Pawn promotion detected! (Implementation pending)" << std::endl;
+            //when pulling piece, remove taken piece type 
         }
+
+        /*
+        robot.moveRobot(board[startIndex].position.x, board[startIndex].position.y, board[startIndex].position.z + 2);
+        robot.pickUpPiece();
+        robot.moveRobot(board[finishIndex].position.x, board[finishIndex].position.y, board[finishIndex].position.z + 2);
+        robot.placePiece();
+        robot.moveHome();
+        */
 
         return true;
 
-    }
-
-    std::pair<int, int> BoardPos::notationToIndex(const std::string& notation) {  
-
-        if (notation.length() != 4) {
-            throw std::invalid_argument("Input must be 4 characters long"); //e4g5
-        }
-
-        char sourceFile = toupper(notation[0]);
-        char sourceRank = notation[1];
-        char destinationFile = toupper(notation[2]);
-        char destinationRank = notation[3];
-
-        // Convert file (A-H) to index (0-7)
-        int sourceCol = sourceFile - 'A';
-        int sourceRow = '8' - sourceRank;
-        int sourceIndex = sourceRow * 8 + sourceCol;
-
-        // Convert destination file (A-H) to index (0-7)
-        int destinationCol = destinationFile - 'A';
-        int destinationRow = '8' - destinationRank;
-        int destinationIndex = destinationRow * 8 + destinationCol;
-
-        //test print
-        //std::cout << "First: " << first << ", Second: " << second << std::endl;
-
-        return {sourceIndex, destinationIndex};
-    }
-
-    bool BoardPos::isValidMove(int sourceIndex, int destinationIndex, const Piece& piece) {
-        
-        //turn 1D indices into 2D coordinates
-        int sourceRow = sourceIndex / 8;
-        int sourceCol = sourceIndex % 8;
-        int destinationRow = destinationIndex / 8;
-        int destinationCol = destinationIndex % 8;
-
-        //calculate the differences between positions
-        int rowDiff = destinationRow - sourceRow;
-        int colDiff = destinationCol - sourceCol;
-
-        //Create a switch case based on the piece type
-        switch (piece.type) {
-            case PieceType::PAWN: {
-                std::cout << "Validating pawn move..." << std::endl;
-                
-                //direction depends on piece colour
-                int forwardDirection = (piece.color == Color::WHITE) ? -1 : 1;
-    
-                //regular move: 1 square forward (no capture)
-                if (colDiff == 0 && rowDiff == forwardDirection) {
-                    // Check if destination is empty
-                    if (!board[destinationIndex].piece.has_value()) {
-                        std::cout << "Valid pawn move: single square forward" << std::endl;
-                        return true;
-                    } else {
-                        std::cout << "Failed pawn move: destination square is occupied" << std::endl;
-                        return false;
-                    }
-                }
-                
-                //first move: 2 squares forward
-                else if (colDiff == 0 && rowDiff == 2 * forwardDirection) {
-                    // Check if this is the pawn's starting position
-                    bool isStartingPosition = (piece.color == Color::WHITE && sourceRow == 6) || 
-                                            (piece.color == Color::BLACK && sourceRow == 1);
-                    
-                    if (!isStartingPosition) {
-                        std::cout << "Failed pawn move: two squares forward only allowed from starting position" << std::endl;
-                        return false;
-                    }
-                    
-                    // Check if both destination and the square in between are empty
-                    int middleIndex = sourceIndex + (8 * forwardDirection);
-                    if (!board[middleIndex].piece.has_value() && !board[destinationIndex].piece.has_value()) {
-                        std::cout << "Valid pawn move: two squares forward from starting position" << std::endl;
-                        return true;
-                    } else {
-                        std::cout << "Failed pawn move: path blocked for two-square move" << std::endl;
-                        return false;
-                    }
-                }
-                
-                //capture move: 1 square diagonally 
-                else if (abs(colDiff) == 1 && rowDiff == forwardDirection) {
-                    // Check if destination has an opponent's piece
-                    if (board[destinationIndex].piece.has_value()) {
-                        if (board[destinationIndex].piece->color != piece.color) {
-                            std::cout << "Valid pawn move: diagonal capture" << std::endl;
-                            return true;
-                        } else {
-                            std::cout << "Failed pawn move: can't capture your own piece" << std::endl;
-                            return false;
-                        }
-                    } else {
-                        std::cout << "Failed pawn move: diagonal move requires capture" << std::endl;
-                        return false;
-                    }
-                }
-                
-                std::cout << "Failed pawn move: invalid move pattern" << std::endl;
-                return false;
-            }
-
-            case PieceType::ROOK: {
-                std::cout << "Validating rook move..." << std::endl;
-                if (sourceRow != destinationRow && sourceCol != destinationCol) {
-                    std::cout << "Failed rook move: must move along rank or file" << std::endl;
-                    return false;
-
-                bool pathClear = isStraightPathClear(sourceIndex, destinationIndex);
-                if (pathClear) {
-                    std::cout << "Valid rook move" << std::endl;
-                } else {
-                    std::cout << "Failed rook move: path blocked" << std::endl;
-                }
-                return pathClear;
-                }
-            }
-
-            case PieceType::BISHOP: {
-                std::cout << "Validating bishop move..." << std::endl;
-                if (abs(rowDiff) != abs(colDiff)) {
-                    std::cout << "Failed bishop move: must move diagonally" << std::endl;
-                    return false;
-                
-                bool pathClear = isDiagonalPathClear(sourceIndex, destinationIndex);
-                if (pathClear) {
-                    std::cout << "Valid bishop move" << std::endl;
-                } else {
-                    std::cout << "Failed bishop move: path blocked" << std::endl;
-                }
-                return pathClear;
-                }
-            }
-                
-            case PieceType::QUEEN: {
-                std::cout << "Validating queen move..." << std::endl;
-                bool pathClear = false;
-                
-                if (sourceRow == destinationRow || sourceCol == destinationCol) {
-                    pathClear = isStraightPathClear(sourceIndex, destinationIndex);
-                    if (pathClear) {
-                        std::cout << "Valid queen move: straight" << std::endl;
-                    } else {
-                        std::cout << "Failed queen move: straight path blocked" << std::endl;
-                    }
-                }
-                else if (abs(rowDiff) == abs(colDiff)) {
-                    pathClear = isDiagonalPathClear(sourceIndex, destinationIndex);
-                    if (pathClear) {
-                        std::cout << "Valid queen move: diagonal" << std::endl;
-                    } else {
-                        std::cout << "Failed queen move: diagonal path blocked" << std::endl;
-                    }
-                } else {
-                    std::cout << "Failed queen move: must move straight or diagonally" << std::endl;
-                }
-                return pathClear;
-            }
-
-            case PieceType::KING: {
-                std::cout << "Validating king move..." << std::endl;
-                //movement restricted to one change in either row or column diff
-                if (abs(rowDiff) <= 1 && abs(colDiff) <= 1) {
-                    std::cout << "Valid king move" << std::endl;
-                    return true;
-                } else {
-                    std::cout << "Failed king move: can only move one square in any direction" << std::endl;
-                    return false;
-                }
-            }
-
-            case PieceType::KNIGHT: {
-                std::cout << "Validating knight move..." << std::endl;
-                if ((abs(rowDiff) == 2 && abs(colDiff) == 1) || (abs(rowDiff) == 1 && abs(colDiff) == 2)) {
-                    std::cout << "Valid knight move" << std::endl;
-                    return true;
-                } else {
-                    std::cout << "Failed knight move: must move in L-shape (2+1)" << std::endl;
-                    return false;
-                }
-            }
-
-            default:
-            std::cout << "Invalid piece type" << std::endl;
-            return false;
-            
-        }
     }   
 
-    bool BoardPos::isPawnPromotion(int sourceIndex, int destinationIndex, const Piece& piece) {
+    bool BoardPos::isPawnPromotion(int destinationIndex) {
+
+        // Check if a pawn has a reached the opposite end of the board
+        // check if destination is on the 8th rank (indices 56-63)
+
         return false;
-    }
-
-    bool BoardPos::isStraightPathClear(int sourceIndex, int destinationIndex) {
-        std::cout << "Checking straight path clearance..." << std::endl;
-        
-        int sourceRow = sourceIndex / 8;
-        int sourceCol = sourceIndex % 8;
-        int destRow = destinationIndex / 8;
-        int destCol = destinationIndex % 8;
-        
-        // Determine direction of movement
-        int rowStep = 0;
-        int colStep = 0;
-        
-        if (sourceRow < destRow) rowStep = 1;       // Moving down
-        else if (sourceRow > destRow) rowStep = -1; // Moving up
-        
-        if (sourceCol < destCol) colStep = 1;       // Moving right
-        else if (sourceCol > destCol) colStep = -1; // Moving left
-        
-        // Starting from the square after the source, check each square until just before the destination
-        int currentRow = sourceRow + rowStep;
-        int currentCol = sourceCol + colStep;
-        
-        while ((currentRow != destRow) || (currentCol != destCol)) {
-            int currentIndex = currentRow * 8 + currentCol;
-            
-            // If there's a piece in the path, the path is blocked
-            if (board[currentIndex].piece.has_value()) {
-                std::cout << "Path blocked at row " << currentRow << ", col " << currentCol << std::endl;
-                return false;
-            }
-            
-            // Move to the next square in the path
-            currentRow += rowStep;
-            currentCol += colStep;
-        }
-        
-        
-        std::cout << "Straight path is clear" << std::endl;
-        return true;
-    }
-
-    bool BoardPos::isDiagonalPathClear(int sourceIndex, int destinationIndex) {
-        std::cout << "Checking diagonal path clearance..." << std::endl;
-        
-        int sourceRow = sourceIndex / 8;
-        int sourceCol = sourceIndex % 8;
-        int destRow = destinationIndex / 8;
-        int destCol = destinationIndex % 8;
-        
-        // Verify the move is actually diagonal (abs(rowDiff) == abs(colDiff))
-        if (abs(sourceRow - destRow) != abs(sourceCol - destCol)) {
-            std::cout << "Not a diagonal move" << std::endl;
-            return false;
-        }
-        
-        // Determine direction of diagonal movement
-        int rowStep = (destRow > sourceRow) ? 1 : -1;
-        int colStep = (destCol > sourceCol) ? 1 : -1;
-        
-        // Starting from the square after the source, check each square until just before the destination
-        int currentRow = sourceRow + rowStep;
-        int currentCol = sourceCol + colStep;
-        
-        while (currentRow != destRow && currentCol != destCol) {
-            int currentIndex = currentRow * 8 + currentCol;
-            
-            // If there's a piece in the path, the path is blocked
-            if (board[currentIndex].piece.has_value()) {
-                std::cout << "Path blocked at row " << currentRow << ", col " << currentCol << std::endl;
-                return false;
-            }
-            
-            // Move to the next square in the path
-            currentRow += rowStep;
-            currentCol += colStep;
-        }
-        
-        // Check if destination has a piece of the same color (can't capture your own piece)
-        if (board[destinationIndex].piece.has_value() && 
-            board[sourceIndex].piece.has_value() && 
-            board[destinationIndex].piece->color == board[sourceIndex].piece->color) {
-            std::cout << "Destination contains a piece of the same color" << std::endl;
-            return false;
-        }
-        
-        std::cout << "Diagonal path is clear" << std::endl;
-        return true;
-    }
-
-    // Helper function to convert piece type to string for debug output
-    std::string BoardPos::getPieceTypeString(PieceType type) {
-        switch (type) {
-            case PieceType::PAWN: return "Pawn";
-            case PieceType::ROOK: return "Rook";
-            case PieceType::KNIGHT: return "Knight";
-            case PieceType::BISHOP: return "Bishop";
-            case PieceType::QUEEN: return "Queen";
-            case PieceType::KING: return "King";
-            default: return "Unknown";
-        }
-    }
-    
-    // Helper function to convert board index to algebraic notation (e.g., A1, C4)
-    std::string BoardPos::getSquareNotation(int index) {
-        int row = index / 8;
-        int col = index % 8;
-        char file = 'A' + col;
-        char rank = '8' - row;
-        return std::string(1, file) + std::string(1, rank);
-    }
-
-    bool BoardPos::moveToCapturedBoard(const Piece& piece) {
-        
-        // Find the first empty slot in the captured board
-        for (int i = 0; i < whiteCapturedPieces.size(); i++) {
-            if (!whiteCapturedPieces[i].piece.has_value()) {
-                // Place the captured piece in this slot
-                whiteCapturedPieces[i].piece = piece;
-                std::cout << "Piece placed in captured board at position " << i << std::endl;
-                return true;
-            }
-        }
-        
-        // If we reach here, there's no empty slot (shouldn't happen in a standard chess game)
-        std::cout << "Warning: No empty slot found in captured board!" << std::endl;
-        return false;
-    }
-
- 
-    void BoardPos::visualiseBoard() {
-
-        for (int i = 0; i < 64; i++) {
-            if (board[i].piece.has_value()) {
-                std::cout << static_cast<int>(board[i].piece->type);
-                std::cout << " ";
-            } else {
-                std::cout << "None";
-            }
-            if (i+1 % 8 == 0) {
-                std::cout << '\n';
-            }
-
-        }
-        
 
     }
+
+    int BoardPos::chessNotationToIndex(const std::string& notation) {
+        if (notation.length() != 2) {
+            std::cerr << "Invalid chess notation: " << notation << std::endl;
+            return -1;
+        }
+        
+        char file = std::toupper(notation[0]); // Convert to uppercase (A-H)
+        char rank = notation[1]; // Numeric rank (1-8)
+        
+        if (file < 'A' || file > 'H' || rank < '1' || rank > '8') {
+            std::cerr << "Invalid chess notation: " << notation << std::endl;
+            return -1;
+        }
+        
+        // Calculate array index (A1 is 0, A2 is 1, ..., H8 is 63) - column-major order
+        int col = file - 'A';
+        int row = rank - '1';
+        
+        return col * 8 + row;
+    }
+
