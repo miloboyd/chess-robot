@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import python_chess2 as chs
+from computer_vision import square_processing as sp
 
 def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     """
@@ -199,16 +200,40 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     for row in range(8):
         for col in range(8):
             # Extract square
+            """
             y1 = row * square_height
             y2 = (row + 1) * square_height
             x1 = col * square_width
             x2 = (col + 1) * square_width
             
             square = warped[y1:y2, x1:x2].copy()
+            """
+           # Define base square boundaries
+            base_x1 = col * square_width
+            base_y1 = row * square_height
+            base_x2 = (col + 1) * square_width
+            base_y2 = (row + 1) * square_height
+
+            # Padding to zoom out (e.g. 25% of square size)
+            padding_x = square_width // 20
+            padding_y = square_height // 20
+
+            # Expand the boundaries
+            x1 = max(base_x1 - padding_x, 0)
+            y1 = max(base_y1 - padding_y, 0)
+            x2 = min(base_x2 + padding_x, warped.shape[1])
+            y2 = min(base_y2 + padding_y, warped.shape[0])
+
+            # Extract expanded square region
+            square = warped[y1:y2, x1:x2].copy()
+
+
             square_images.append(square)
             
             # Detect if there's a piece and its color
-            is_piece, piece_color = detect_piece_and_color(square)
+            #is_piece, piece_color = detect_piece_and_color(square)
+            is_piece, piece_color, z = sp.detect_chess_piece_colour(square)
+            
             
             # Update the board array
             if is_piece:
@@ -301,7 +326,7 @@ def detect_piece_and_color(square_image):
     
     # Filter contours by size
     min_area = (width * height) * 0.15  # At least 5% of square
-    max_area = (width * height) * 0.9   # At most 90% of square
+    max_area = (width * height) * 0.95   # At most 90% of square
     
     # Variable to store the largest valid contour
     largest_contour = None
@@ -460,7 +485,7 @@ def main(img1, img2):
             i = 2
     return results['detected_move']
 def main2():
-    current_board, corners  = analyze_chessboard("chessboards/realphone1.jpg", auto_calib=False,DEBUG=True)
+    current_board, corners  = analyze_chessboard("piecereal/colourboard2.png", auto_calib=False,DEBUG=True)
     
 
 
@@ -468,8 +493,9 @@ def main2():
 if __name__ == "__main__":
     img1 = "chessboards/screen1.png"
     img2 = "chessboards/screen2.png"
-    move = main(img1, img2)
-    print(move)
+    #move = main(img1, img2)
+    #print(move)
+    main2()
     
     """
     print(board_array)
