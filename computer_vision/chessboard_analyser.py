@@ -24,88 +24,13 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
 # Initialize approx
     approx = None
     
-    if corners is not None and len(corners) > 0:
+    
+    if auto_calib == True:
+        approx, success = detect_blue_corners(image_path)
+        if not success:
+            approx = select_points(image_path)
+    elif corners is not None and len(corners) > 0:
         approx = corners
-    elif auto_calib == True:
-        # Step 1: Find the chessboard corners
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        
-        # Preprocessing to enhance the contrast of the chessboard
-        gray = cv2.GaussianBlur(gray, (5, 5), 0)
-        
-        # Use adaptive thresholding to handle different lighting conditions
-        thresh = cv2.adaptiveThreshold(
-            gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
-        )
-
-        cv2.imshow("binary", thresh)  # Display the image in a window
-        # Find contours
-        contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        print("number of contours detected: ", len(contours))
-        # Debug: Show all contours
-        debug_contours = img.copy()
-        cv2.drawContours(debug_contours, contours, -1, (0, 255, 0), 2)
-        cv2.imshow("All Contours", debug_contours)
-
-        # Filter contours by size and position to exclude the image frame
-        filtered_contours = []
-        img_height, img_width = img.shape[:2]
-        img_area = img_height * img_width
-
-        for contour in contours:
-            # Get contour area
-            area = cv2.contourArea(contour)
-            
-            # Get contour bounding rectangle
-            x, y, w, h = cv2.boundingRect(contour)
-            
-            # Calculate how much of the image frame this contour covers
-            edge_contact = False
-            
-            # Check if the contour touches the image edges
-            if x <= 1 or y <= 1 or x + w >= img_width - 1 or y + h >= img_height - 1:
-                edge_contact = True
-            
-            # Calculate area ratio (contour area / image area)
-            area_ratio = area / img_area
-            
-            # Skip contours that are too small
-            if area < 1000:
-                continue
-                
-            # Skip the contour if it's too large (probably the frame) or touches the edges
-            if area_ratio > 0.8 or edge_contact:
-                continue
-                
-            # Add to filtered contours
-            filtered_contours.append(contour)
-
-        # Debug: Show filtered contours
-        debug_filtered = img.copy()
-        cv2.drawContours(debug_filtered, filtered_contours, -1, (0, 0, 255), 2)
-        cv2.imshow("Filtered Contours", debug_filtered)
-
-        # If no valid contours found, try different approach
-        if not filtered_contours:
-            print("No suitable contours found after filtering. Try adjusting parameters.")
-            # You could add fallback logic here
-        else:
-            # Find the largest of the filtered contours
-            board_contour = max(filtered_contours, key=cv2.contourArea)
-            
-            # Show the selected board contour
-            debug_board = img.copy()
-            cv2.drawContours(debug_board, [board_contour], -1, (255, 0, 0), 3)
-            cv2.imshow("Selected Board Contour", debug_board)
-    # Get the corner points of the board
-        peri = cv2.arcLength(board_contour, True)
-        approx = cv2.approxPolyDP(board_contour, 0.02 * peri, True)
-
-        # If we don't get exactly 4 corners, try to use the minimum area rectangle
-        if len(approx) != 4:
-            rect = cv2.minAreaRect(board_contour)
-            box = cv2.boxPoints(rect)
-            approx = np.int0(box)
     else:
         approx = select_points(image_path)
 
@@ -120,6 +45,10 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     ordered_pts[1] = pts[np.argmin(diff)]  # Top-right
     ordered_pts[3] = pts[np.argmax(diff)]  # Bottom-left
 
+
+    if None in ordered_pts or any(np.isnan(pt).any() for pt in ordered_pts):
+        raise ValueError("Corner detection failed — one or more points are missing or invalid.")
+
     # Create a copy of the original image to draw points on
     img_with_points = img.copy()
 
@@ -132,7 +61,7 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
     point_labels = ["TL", "TR", "BR", "BL"]
 
     for i, point in enumerate(ordered_pts):
-        x, y = point.astype(int)
+        x, y = int(point[0]), int(point[1])
         cv2.circle(img_with_points, (x, y), 10, colors[i], -1)
         cv2.putText(img_with_points, point_labels[i], (x+10, y+10), 
                     cv2.FONT_HERSHEY_SIMPLEX, 1, colors[i], 2)
@@ -370,6 +299,86 @@ def detect_piece_and_color(square_image):
     
     return True, color
 
+def detect_blue_corners(image_path, show_result=False):
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"Image not found: {image_path}")
+    h, w = img.shape[:2]
+
+    # Convert to HSV
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+    # HSV range for blue
+    lower_blue = np.array([90, 50, 50])
+    upper_blue = np.array([130, 255, 255])
+    mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+    # Morphological clean-up
+    kernel = np.ones((3,3), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+
+    # Find contours
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Define image corners
+    image_corners = {
+        "TL": (0, 0),
+        "TR": (w, 0),
+        "BL": (0, h),
+        "BR": (w, h)
+    }
+    max_distance = min(w, h) * 0.15  # Threshold: 15% of size
+
+    found_corners = {}
+
+    for cnt in contours:
+        M = cv2.moments(cnt)
+        if M['m00'] == 0:
+            continue
+        cx = int(M['m10'] / M['m00'])
+        cy = int(M['m01'] / M['m00'])
+        point = (cx, cy)
+
+        # Check if this point is close to any corner
+        for label, corner in image_corners.items():
+            dist = np.linalg.norm(np.array(point) - np.array(corner))
+            if dist < max_distance and label not in found_corners:
+                found_corners[label] = point
+                break
+
+    # Ensure all 4 corners were found
+    ordered_labels = ["TL", "TR", "BL", "BR"]
+    ordered_points = []
+
+    for lbl in ordered_labels:
+        pt = found_corners.get(lbl)
+        if pt is None:
+            ordered_points.append((np.nan, np.nan))
+        else:
+            ordered_points.append(pt)
+
+    success = all(
+        isinstance(pt, (list, tuple)) and
+        len(pt) == 2 and
+        not np.isnan(pt[0]) and
+        not np.isnan(pt[1])
+        for pt in ordered_points
+    )
+
+
+
+    if show_result:
+        for point in ordered_points:
+            cv2.circle(img, point, 10, (0, 255, 0), 2)
+        print("Ordered Corners (TL, TR, BL, BR):", ordered_points)
+        cv2.imshow("Detected Corners", img)
+        cv2.imshow("Blue Mask", mask)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+    
+    return ordered_points, success
+
 def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     """
     Opens an image and allows the user to select points by clicking.
@@ -485,7 +494,7 @@ def main(img1, img2):
             i = 2
     return results['detected_move']
 def main2():
-    current_board, corners  = analyze_chessboard("piecereal/colourboard2.png", auto_calib=False,DEBUG=True)
+    current_board, corners  = analyze_chessboard("piecereal/colourboard3.png", auto_calib=True,DEBUG=True)
     
 
 
