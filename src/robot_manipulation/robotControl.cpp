@@ -9,7 +9,6 @@ public:
   explicit RobotControl() : Node("ur3e_control_node")
   {
     RCLCPP_INFO(this->get_logger(), "Initializing UR3e Control Node");
-    
     // Wait for MoveIt to come up
     std::this_thread::sleep_for(std::chrono::seconds(2));
   }
@@ -37,16 +36,35 @@ public:
 
     double pi = 3.141592654;
 
+    // simple joint movement - doesnt work well
 
-    RCLCPP_INFO(this->get_logger(), "test link 1");
-    std::vector<double> test_pose = {90*(pi/180), 304*(pi/180), 64*(pi/180), -101*(pi/180), 270*(pi/180), 0.0};
-    move_group.setJointValueTarget(test_pose);
-    move_group.move();
+      // RCLCPP_INFO(this->get_logger(), "test link 1");
+      // std::vector<double> test_pose = {90*(pi/180), 304*(pi/180), 64*(pi/180), -101*(pi/180), 270*(pi/180), 0.0};
+      // move_group.setJointValueTarget(test_pose);
+      // move_group.move();
 
+    std::vector<geometry_msgs::msg::Pose> waypoints;
+    waypoints.push_back(move_group.getCurrentPose().pose);
+    geometry_msgs::msg::Pose target_pose;
+    target_pose.position.x = 0.0;
+    target_pose.position.y = 0.3;
+    target_pose.position.z = 0.4;
+    target_pose.orientation.x = 0.0;
+    target_pose.orientation.y = 1.0;
+    target_pose.orientation.z = 0.0;
+    target_pose.orientation.w = 0.0;
+    waypoints.push_back(target_pose);
 
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    moveit_msgs::msg::RobotTrajectory trajectory;
+    const double eef_step = 0.01;  // 1cm resolution
+    const double jump_threshold = 0.0;  // Disable jump threshold
 
+    double fraction = move_group.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    RCLCPP_INFO(this->get_logger(), "Cartesian path computed (%.2f%% achieved)", fraction * 100.0);
 
+    moveit::planning_interface::MoveGroupInterface::Plan plan;
+    plan.trajectory_ = trajectory;
+    move_group.execute(plan);
 
     
     /**    // If home position is not defined, use joint values
@@ -71,7 +89,6 @@ public:
 
     // Try a Cartesian move
     RCLCPP_INFO(this->get_logger(), "Moving to Cartesian target");
-    geometry_msgs::msg::Pose target_pose;
     target_pose.position.x = 0.0;
     target_pose.position.y = 0.3;
     target_pose.position.z = 0.3;
@@ -87,7 +104,6 @@ public:
 
 
     
-  
     // Return to home position
     RCLCPP_INFO(this->get_logger(), "Returning to home position");
     std::vector<double> home_position = {0.0, -1.57, 0.0, -1.57, 0.0, -3.14};
@@ -108,7 +124,6 @@ int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<RobotControl>();
-  
   // Run the demo
   node->run_demo();
   

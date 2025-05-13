@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(std_srvs REQUIRED)
 find_package(rclcpp_components REQUIRED)
 
 # Find moveIt dependencies
@@ -63,6 +64,7 @@ ament_target_dependencies(rs2
   rclcpp
   rclcpp_components
   std_msgs
+  std_srvs
 )
 
 target_link_libraries(rs2
@@ -138,7 +140,7 @@ install(
   boardPos
   robotControl
   boardpos_lib
-  LIBRARY LIBRARY DESTINATION lib
+  #LIBRARY LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
