@@ -27,3 +27,30 @@ Robot node requirements:
 Camera integration:
     the camera has not been tested yet and therefore has not been fully integrated. I will include instructions on how to use it once it is tested.
     Eventually it will be toggled on using a rosarg.
+
+
+Equipment Included
+4x chessboard quadrants
+16x custom white chess pieces
+16x custom black chess pieces
+1x alignment board
+
+Board Setup:
+Place alignment board on the surface of the UR3e bench with corners aligned for future measurements. 
+Place all 4 quadrants on the alignment board. Ensure markings below the board follow order so the board is fitted correctly.
+Place white chess pieces on board ensuring the Queen is placed on white grid.
+Repeat step 3 for black pieces ensuring the black Queen is placed on the black grid.
+
+
+
+Ai Subsystem
+
+Overview:
+The Ai subsystem is responsible for interpreting the chessboard state and generating optimal moves for the robot using the Stockfish chess engine. This module receives FEN strings from the vision subsystem, processes them and returns a valid move in under two seconds.
+
+Inputs and Outputs:
+Input: FEN string (Forsyth-Edwards Notation) from the vision system (Sean’s Subsystem)
+
+Process: Stockfish generates the best move based on the current board state
+
+Output: Valid move in algebraic notation -> passed to the robot manipulation subsystem (Milo’s subsystem)
