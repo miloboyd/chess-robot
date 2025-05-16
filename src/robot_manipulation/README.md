@@ -1,4 +1,4 @@
-This git repository details a project designed to manipulate a ur3e robot arm to act as a chess opponent. This file will detail several steps for downloading and running these files.
+This robot manipulation folder details the robot arm manipulation components using the ur3e robot arm and Onrobot RG2 Gripper. This file will detail several steps for downloading and running these files.
 
 
 # UR3e Robot Control with ROS 2 and MoveIt
@@ -13,11 +13,13 @@ This guide explains how to set up and control a Universal Robots UR3e using ROS 
 ## 1. Install Required Packages
 
 Install the necessary packages from the provided links:
-```bash
-https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver
-https://moveit.picknik.ai/humble/doc/tutorials/getting_started/getting_started.html
-https://github.com/ros-controls/gz_ros2_control/tree/humble
-```
+- [Universal Robot ROS2 Driver](https://github.com/UniversalRobots/Universal_Robots_ROS2_Driver/tree/humble) - humble branch
+    - [GZ ROS2 Control](https://github.com/ros-controls/gz_ros2_control/tree/humble) - humble branch (optional if complications arise through UR Driver
+- [UR OnRobot ROS2 Driver](https://github.com/tonydle/UR_OnRobot_ROS2), which requires:
+    - [OnRobot ROS2 Description](https://github.com/tonydle/OnRobot_ROS2_Description)
+    - libnet1-dev (for Modbus TCP/Serial)
+    - [Modbus](https://github.com/Mazurel/Modbus) C++ library (included as a submodule)
+- [MoveIt Humble](https://moveit.picknik.ai/humble/doc/tutorials/getting_started/getting_started.html) 
 
 ## 2. Set up Workspaces
 
@@ -42,23 +44,23 @@ source install/setup.bash
 
 ## 3. Connect to a Real UR3e Robot
 
-### Step 1: Launch the UR Robot Driver
+### Step 1: Start robot
+   ```sh
+   ros2 launch ur_onrobot_control start_robot.launch.py ur_type:=ur3e onrobot_type:=rg2 robot_ip:=<robot_ip> launch_rviz:=false
+   ```
+Common arguments:
+- `use_fake_hardware` (default: `false`): Use mock hardware interface for testing
+- `launch_rviz` (default: `true`): Launch RViz with the robot model
+- `tf_prefix` (default: `""`): Prefix for all TF frames
 
-This command connects to the actual UR3e robot hardware:
+Replace <robot_IP> with your robot's actual IP address.
 
-```bash
-source ~/ur_ws/install/setup.bash
-ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.250 launch_rviz:=false
-```
-
-Replace `192.168.0.250` with your robot's actual IP address.
-
-### Step 2: Launch MoveIt to Control the Robot
+### Step 2: Launch MoveIt
 
 In a new terminal:
 
-```bash
-ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168.0.250
+```sh
+ros2 launch ur_onrobot_moveit_config ur_onrobot_moveit.launch.py ur_type:=ur3e onrobot_type:=rg2
 ```
 
 ### Step 3: Execute the run file
@@ -66,7 +68,7 @@ ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168
 In another terminal:
 
 ```bash
-ros2 ros2 run rs2 robotControl
+ros2 run rs2 robotControl
 ```
 
 ## 4. Simulation
@@ -80,16 +82,12 @@ If you want to test without a real robot, you can use a fake hardware system:
 cd ~/ur_ws
 colcon build --symlink-install --packages-select rs2
 source install/setup.bash
+
 # Launch simulation
+   ros2 launch ur_onrobot_control start_robot.launch.py ur_type:=ur3e onrobot_type:=rg2 robot_ip:=<robot_ip> launch_rviz:=false use_fake_hardware:=true
 
-```bash
-ros2 launch ur_robot_driver ur_control.launch.py ur_type:=ur3e robot_ip:=192.168.0.250 launch_rviz:=false use_fake_hardware:=true
-```
-
-Then launch MoveIt with the simulation flag:
-
-```bash
-ros2 launch ur_moveit_config ur_moveit.launch.py ur_type:=ur3e robot_ip:=192.168.0.250
+#Then launch MoveIt
+ros2 launch ur_onrobot_moveit_config ur_onrobot_moveit.launch.py ur_type:=ur3e onrobot_type:=rg2
 ```
 
 ## 5. Useful Commands
@@ -122,16 +120,20 @@ ros2 topic echo /controller_manager/status
 ### Robot Not Connecting
 - Verify the robot IP address
 - Check if the robot is powered on and in Remote Control mode
-- Ping the robot: `ping 192.168.0.250`
+- Ping the robot: `ping 192.168.0.250` (example IP address)
 
 ### Move Group Not Planning
 - Check if the robot is in an error state
 - Verify joint states are being published: `ros2 topic echo /joint_states`
 - Check for collisions in the planning scene
 
-### ExtractIKSolutions iksolver cannot be constructed
-- Confirm you specified the right `ur_type` parameter (ur3e)
-- Ensure MoveIt and the robot driver are correctly installed
+### MoveIt not working 
+- Check that you have properly built the workspace and sourced after changes
+
+```bash
+colcon build --symlink-install --packages-select ~/path_to_workspace/..
+source install/setup.bash
+```
 
 ## 7. Additional Resources
 
