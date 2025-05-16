@@ -150,7 +150,7 @@ public:
 
     grip_pub->publish(open);
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
 
 
     bool success = (move_group.plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
@@ -161,13 +161,11 @@ public:
 
     grip_pub->publish(close);
 
-
-    
-    //message.data = 
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
 
     
 
-    
+    /*
     moveit_msgs::msg::OrientationConstraint ocm;
     ocm.link_name = "gripper_tcp";
     ocm.header.frame_id = "base_link";
@@ -180,6 +178,7 @@ public:
     moveit_msgs::msg::Constraints test_constraints;
     test_constraints.orientation_constraints.push_back(ocm);
     move_group.setPathConstraints(test_constraints);
+    */
     
     move_group.setMaxVelocityScalingFactor(0.01);
     move_group.setMaxAccelerationScalingFactor(0.01);
@@ -196,6 +195,8 @@ public:
     RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0);
 
     move_group.execute(trajectory);
+
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
 
     grip_pub->publish(open);
 
@@ -215,7 +216,7 @@ public:
 
 
 
-    std::this_thread::sleep_for(std::chrono::seconds(3));
+    //std::this_thread::sleep_for(std::chrono::seconds(3));
 
 
     
