@@ -99,28 +99,35 @@ class Chess_Core(Node):
         return (row, col)
 
     def check_move(self):
-        i = 1
         results = ""
-        while i ==1:
-            if self.current_board is None or len(self.current_board) == 0:
-                self.current_board, self.corners  = self.game.analyze_chessboard(self.prev_img, auto_calib=False)
-                print(self.current_board)
-            else:
-                board_array, _ = self.game.analyze_chessboard(self.current_img, auto_calib=False, corners=self.corners)
-                #print("Board representation (0=empty, 1=white, 2=black):")
 
-                results = self.game.analyze_binary_board_state(board_array)
+        input("Press Enter to analyze move...")  # Wait for key press
 
-                # Access the analysis results
-                if results["detected_move"]:
-                    print(f"Move detected: {results['detected_move']}")
-                else:
-                    print("No valid move detected")
+        # Analyze the previous board state (used as reference)
+        if self.current_board is None or len(self.current_board) == 0:
+            self.current_board, self.corners = self.game.analyze_chessboard(self.prev_img, auto_calib=False)
+            print("Initialized previous board:")
+            print(self.current_board)
 
-                # The PGN so far
-                print(results["pgn"])
-                i = 2
-        return results['detected_move']
+        # Analyze the new board state from current image
+        board_array, _ = self.game.analyze_chessboard(self.current_img, auto_calib=False, corners=self.corners)
+
+        # Compare boards to detect the move
+        results = self.game.analyze_binary_board_state(board_array)
+
+        # Display the results
+        if results["detected_move"]:
+            print(f"Move detected: {results['detected_move']}")
+        else:
+            print("No valid move detected")
+
+        print("PGN so far:", results["pgn"])
+
+        # Update previous image and board for next move detection
+        self.prev_img = self.current_img.copy()
+        self.current_board = board_array
+
+        return results["detected_move"]
     
     def check_move_sim(self):
 
