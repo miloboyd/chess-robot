@@ -74,6 +74,10 @@ target_link_libraries(rs2
 )
 
 # ------------------------------------------------------
+# ROBOT_MANIPULATION
+# ------------------------------------------------------
+
+# ------------------------------------------------------
 # (boardPos)
 # ------------------------------------------------------
 
@@ -107,7 +111,6 @@ target_link_libraries(boardPos
   boardpos_lib
 )
 
-
 # ------------------------------------------------------
 # (robotControl)
 # ------------------------------------------------------
@@ -128,6 +131,17 @@ ament_target_dependencies(robotControl
   moveit_task_constructor_core
   tf2_geometry_msgs
   tf2_eigen
+)
+
+# ------------------------------------------------------
+# (Python)
+# ------------------------------------------------------
+
+ament_python_install_package(computer_vision)
+install(PROGRAMS
+  # This points to the Python entry point
+  computer_vision/chess_core.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 # ------------------------------------------------------
@@ -156,5 +170,5 @@ install(
   OPTIONAL
 )
 
-
 ament_package()
+
