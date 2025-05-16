@@ -145,8 +145,7 @@ def detect_contours2(image_path):
     cv2.imshow('Non-Rectangular Contours', contour_image)
     return contours
 
-
-def find_center_of_mass(image):
+def find_center_of_mass(image, DEBUG=False):
 
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
@@ -167,15 +166,14 @@ def find_center_of_mass(image):
         
 
         # Draw a circle at the center of mass
-
-        cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1) 
+        if DEBUG:
+            cv2.circle(image, (cx, cy), 5, (0, 0, 255), -1) 
 
 
 
     return image
 
-
-def detect_chess_piece(image_path):
+def detect_chess_piece(image_path, DEBUG=False):
     """
     Detect if there is a chess piece in the given image and determine its color.
     
@@ -189,11 +187,16 @@ def detect_chess_piece(image_path):
             - output_image (np.ndarray): Processed image with contours
     """
     # Read the image
-    image = cv2.imread(image_path)
+    if isinstance(image_path, str):
+        image = cv2.imread(image_path)
+    elif isinstance(image_path, np.ndarray):
+        image = image_path.copy()
+    else:
+        raise ValueError("image_path must be a file path or a numpy.ndarray")
+
     if image is None:
-        print(f"Error: Could not read image at {image_path}")
-        return False, None, None
-    
+        raise ValueError("Failed to load image. Check the path or array contents.")
+
     # Create a copy for visualization
     output = image.copy()
     
@@ -254,31 +257,98 @@ def detect_chess_piece(image_path):
                 piece_color = "black"
                 cv2.putText(output, "BLACK", (10, 30), 
                            cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            
-            print(f"Chess piece detected! Color: {piece_color} (Avg brightness: {avg_brightness:.1f})")
+            if DEBUG:
+                print(f"Chess piece detected! Color: {piece_color} (Avg brightness: {avg_brightness:.1f})")
         else:
-            print("Chess piece detected, but couldn't determine color.")
+            if DEBUG:
+                print("Chess piece detected, but couldn't determine color.")
     else:
-        print("No chess piece detected.")
+        if DEBUG:
+            print("No chess piece detected.")
     
-    # Display images (optional)
-    cv2.imshow('Original', image)
-    cv2.imshow('Thresholded', thresh)
-    if piece_mask is not None:
-        cv2.imshow('Piece Mask', piece_mask)
-    cv2.imshow('Detection Result', output)
+    if DEBUG:
+        # Display images (optional)
+        cv2.imshow('Original', image)
+        cv2.imshow('Thresholded', thresh)
+        if piece_mask is not None:
+            cv2.imshow('Piece Mask', piece_mask)
+        cv2.imshow('Detection Result', output)
    
+    return piece_detected, piece_color, output
+
+import cv2
+import numpy as np
+
+def detect_chess_piece_colour(image_input, DEBUG=False):
+    """
+    Detects if a red or yellow chess piece is present in the image based on HSV color.
+
+    Args:
+        image_input (str or np.ndarray): Path to the image or already-loaded image array.
+        DEBUG (bool): If True, display debugging images and print logs.
+
+    Returns:
+        tuple: (piece_detected, color, output_image)
+            - piece_detected (bool): True if red or yellow is found
+            - color (str): "white" (for red), "black" (for yellow), or None
+            - output_image (np.ndarray): Image with detection annotations (copy of input)
+    """
+    if isinstance(image_input, str):
+        image = cv2.imread(image_input)
+    elif isinstance(image_input, np.ndarray):
+        image = image_input.copy()
+    else:
+        raise ValueError("image_input must be a file path or a numpy.ndarray")
+
+    if image is None:
+        raise ValueError("Failed to load image.")
+
+    output = image.copy()
+    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+    pink_lower = np.array([140, 50, 100])
+    pink_upper = np.array([170, 255, 255])
+    pink_mask = cv2.inRange(hsv, pink_lower, pink_upper)
+
+    # Yellow range
+    yellow_lower = np.array([20, 100, 100])
+    yellow_upper = np.array([35, 255, 255])
+    yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+
+    # Decision logic
+    piece_detected = False
+    piece_color = None
+
+    if np.sum(pink_mask) > 0:
+        piece_detected = True
+        piece_color = "white"  # or "pink" if you prefer
+        cv2.putText(output, "PINK -> WHITE", (10, 30),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 105, 180), 2)  # Hot pink text
+    elif np.sum(yellow_mask) > 0:
+        piece_detected = True
+        piece_color = "black"  # yellow → black
+        cv2.putText(output, "YELLOW -> BLACK", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2)
+
+    if DEBUG:
+        print(f"Detected: {piece_detected}, Color: {piece_color}")
+        cv2.imshow("Input", image)
+        cv2.imshow("Pink Mask", pink_mask)
+        cv2.imshow("Yellow Mask", yellow_mask)
+        cv2.imshow("Result", output)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
     return piece_detected, piece_color, output
 
 
 
-
 if __name__ == "__main__":
-    img_path = "pieces/castlereal.png"
+    img_path = "piecereal/colourpiece1.png"
     img = cv2.imread(img_path)
     #cv2.imshow("original", img)
     #det = detect_contours2(img_path)
-    res = detect_chess_piece(img_path)
+    #res = detect_chess_piece(img_path)
+    res = detect_chess_piece_colour(img_path, DEBUG=True)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
    
