@@ -1,2 +1,0 @@
-Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/ubuntu/git/rs2 -DCMAKE_INSTALL_PREFIX=/home/ubuntu/git/rs2/install/rs2
-Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '1': CMAKE_PREFIX_PATH=/opt/ros/humble /usr/bin/cmake /home/ubuntu/git/rs2 -DCMAKE_INSTALL_PREFIX=/home/ubuntu/git/rs2/install/rs2

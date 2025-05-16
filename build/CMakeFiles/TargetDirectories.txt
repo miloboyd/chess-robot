@@ -1,2 +1,0 @@
-/home/milo/git/rs2/robot_manipulation/build/CMakeFiles/edit_cache.dir
-/home/milo/git/rs2/robot_manipulation/build/CMakeFiles/rebuild_cache.dir
