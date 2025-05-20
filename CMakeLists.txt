@@ -115,15 +115,15 @@ target_link_libraries(boardPos
 # (robotControl)
 # ------------------------------------------------------
 
-add_executable(robotControl
+add_library(robotControl_lib
   src/robot_manipulation/robotControl.cpp
 )
 
-target_include_directories(robotControl PUBLIC 
+target_include_directories(boardpos_lib PUBLIC
   ${COMMON_INCLUDE_DIRS}
 )
 
-ament_target_dependencies(robotControl
+ament_target_dependencies(robotControl_lib
   rclcpp
   moveit_core
   moveit_ros_planning
@@ -132,6 +132,21 @@ ament_target_dependencies(robotControl
   tf2_geometry_msgs
   tf2_eigen
 )
+
+add_executable(robotControl
+  src/robot_manipulation/main.cpp
+)
+
+ament_target_dependencies(robotControl
+  rclcpp
+  std_msgs
+)
+
+target_include_directories(robotControl PUBLIC 
+  ${COMMON_INCLUDE_DIRS}
+)
+
+
 
 # ------------------------------------------------------
 # (Python)
