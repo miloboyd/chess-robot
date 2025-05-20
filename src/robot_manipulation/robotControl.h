@@ -11,32 +11,56 @@
 
  #include <rclcpp/rclcpp.hpp>
  #include <moveit/move_group_interface/move_group_interface.h>
+ #include <moveit/planning_scene_interface/planning_scene_interface.h>
+ #include <std_msgs/msg/float64_multi_array.hpp>
+ #include <math.h>
  #include <thread>
  #include <chrono>
 
 
- /** */
- class RobotControl {
+ class RobotControl : public rclcpp::Node {
 
 public:
 
     /**
      * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate
      */
-    RobotControl();
-
-
+    explicit RobotControl();
+    
     /**
+     * @brief Destructor
+     */
+    ~RobotControl() = default;
+
+    /*
      * @brief Executes robot movement command to a specified coordinate
      * 
      * @param x_coordinate, y_coordinate, z_coordinate Grid coordinate 
      */
     bool moveRobot(double x_coordinate, double y_coordinate, double z_coordinate);
 
+    /**
+     * @brief Executes pick movement, descending to piece level and clamping on piece position 
+     * @returns Successful execution status 
+     */
     bool pickUpPiece();
-    bool placePiece();
-    bool moveHome();
 
- };
+    /**
+     * @brief Exectures place movement, descending to piece level and placing piece
+     * @returns Successful execution status
+     */
+    bool placePiece();
+
+    void setUpPlanningScene();
+
+private:
+    //initialise class member variables
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr grip_pub;
+    std_msgs::msg::Float64MultiArray open;
+    std_msgs::msg::Float64MultiArray close;
+    moveit::planning_interface::MoveGroupInterface move_group;
+
+
+};
 
  #endif // ROBOT_CONTROL_H
