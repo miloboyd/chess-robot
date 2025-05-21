@@ -6,15 +6,38 @@ RobotControl::RobotControl() : Node("ur3e_control_node") {
   RCLCPP_INFO(this->get_logger(), "Initializing UR3e Control Node");
   std::this_thread::sleep_for(std::chrono::seconds(2));
 
+  /**
   //initialise moveIt
   RCLCPP_INFO(this->get_logger(), "Creating MoveGroupInterface for ur_onrobot_manipulator");
   
   move_group_ptr = std::make_unique<moveit::planning_interface::MoveGroupInterface>(
     shared_from_this(), "ur_onrobot_manipulator");
   //move_group(shared_from_this(), "ur_onrobot_manipulator") 
+  */
+
+  /**
+  try {
+    auto shared_ptr = shared_from_this();
+    RCLCPP_INFO(this->get_logger(), "shared_from_this() succeeded");
+    
+    RCLCPP_INFO(this->get_logger(), "Creating MoveGroupInterface for ur_onrobot_manipulator");
+    
+    move_group_ptr = std::make_unique<moveit::planning_interface::MoveGroupInterface>(
+        shared_ptr, "ur_onrobot_manipulator");
+        
+    RCLCPP_INFO(this->get_logger(), "MoveGroupInterface created successfully");
+    
+  } catch (const std::bad_weak_ptr& e) {
+      RCLCPP_ERROR(this->get_logger(), "bad_weak_ptr error: %s", e.what());
+      throw;
+  } catch (const std::exception& e) {
+      RCLCPP_ERROR(this->get_logger(), "Other error: %s", e.what());
+      throw;
+  }
+  */
   
-  move_group_ptr->setMaxVelocityScalingFactor(0.01);
-  move_group_ptr->setMaxAccelerationScalingFactor(0.01);
+  //move_group_ptr->setMaxVelocityScalingFactor(0.01);
+  //move_group_ptr->setMaxAccelerationScalingFactor(0.01);
 
   //initialise connection to gripper. Set global parameters to use 
   grip_pub = this->create_publisher<std_msgs::msg::Float64MultiArray>(
@@ -33,6 +56,7 @@ bool RobotControl::moveRobot(double x_coordinate, double y_coordinate, double z_
   RCLCPP_INFO(this->get_logger(), "Planning frame: %s", move_group_ptr->getPlanningFrame().c_str());
   RCLCPP_INFO(this->get_logger(), "End effector link: %s", move_group_ptr->getEndEffectorLink().c_str());
   
+  /*
   geometry_msgs::msg::Pose target_pose1;
   // Gripper pointing right (90 degrees around Z)
   // Gripper pointing backward (180 degrees around Z)
@@ -45,21 +69,130 @@ bool RobotControl::moveRobot(double x_coordinate, double y_coordinate, double z_
   target_pose1.position.y = 0.2;
   target_pose1.position.z = 0.1;
   move_group_ptr->setPoseTarget(target_pose1);
-
   moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
   bool success = (move_group_ptr->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
-
   RCLCPP_INFO(this->get_logger(), "Visualizing plan 1 (pose goal) %s", success ? "" : "FAILED");
-
   move_group_ptr->move();
+  */
+    //grip_pub->publish(close);
 
+    move_group_ptr->setMaxVelocityScalingFactor(0.1);
+    move_group_ptr->setMaxAccelerationScalingFactor(0.1);
+
+    //cartesian path down to level to grasp piece
+    geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+    RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+                current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
+  
+    std::vector<double> joint_group_positions = {83.5*M_PI/180, -74.5*M_PI/180, 38.5*M_PI/180, -54.1*M_PI/180, -89.7*M_PI/180, -725.9*M_PI/180};
+
+
+    std::vector<double> joint_values = move_group_ptr->getCurrentJointValues();
+    std::vector<std::string> joint_names = move_group_ptr->getJointNames();
+
+    RCLCPP_INFO(this->get_logger(), "Current joint positions:");
+    for (size_t i = 0; i < joint_names.size(); ++i) {
+        RCLCPP_INFO(this->get_logger(), "  %s: %.3f rad (%.1f deg)", 
+                    joint_names[i].c_str(), joint_values[i], joint_values[i] * 180.0 / M_PI);
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Current joint positions:");
+    for (size_t i = 0; i < joint_values.size(); ++i) {
+      RCLCPP_INFO(this->get_logger(), "  Joint %zu: %.3f radians (%.1f degrees)", 
+                i, joint_values[i], joint_values[i] * 180.0 / M_PI);
+    }
+
+
+    //move_group_ptr->setJointValueTarget(joint_group_positions);
+    //move_group_ptr->move();
+
+    //moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+    //bool success = (move_group_ptr->plan(my_plan) == moveit::core::MoveItErrorCode::SUCCESS);
+    //move_group_ptr->execute(my_plan);
+
+
+    
+
+    geometry_msgs::msg::Pose Pose;
+    Pose.position.x = x_coordinate;
+    Pose.position.y = y_coordinate;
+    Pose.position.z = z_coordinate;
+    Pose.orientation.x = 1.0;  // Default
+    Pose.orientation.y = 0.0;  // Default
+    Pose.orientation.z = 0.0;  // Default  
+    Pose.orientation.w = 0.0;  // Default 
+
+
+    /**
+     * base = 83.23 degrees
+     * shoulder = -74.64 degrees
+     * elbow = 38.38
+     * wrist 1 = -53.93
+     * wrist 2 -89.82
+     * wrist 3 = 354.29 
+     */
+    std_msgs::msg::Float64MultiArray test;
+    test.data = {0.088};  
+    grip_pub->publish(test);
+
+
+
+    
+    //define waypoint
+    RCLCPP_INFO(this->get_logger(), "Target position: (%.3f, %.3f, %.3f)", 
+                Pose.position.x, Pose.position.y, Pose.position.z);
+  
+
+    std::vector<geometry_msgs::msg::Pose> waypoints;
+    current_pose.position.z += 0.05;
+    waypoints.push_back(current_pose);
+  
+    moveit_msgs::msg::RobotTrajectory trajectory;
+    const double jump_threshold = 0.00;
+    const double eef_step = 0.0005;
+    double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+    RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+
+    moveit::planning_interface::MoveGroupInterface::Plan plan;
+    plan.trajectory_ = trajectory;
+    //execute motion
+    move_group_ptr->execute(plan);
+  
   return true;
 
 }
 
+
+
 void RobotControl::setConstraints() {
   
+}
+
+std::shared_ptr<RobotControl> RobotControl::create() {
+  // Create the node using shared_ptr
+  auto node = std::shared_ptr<RobotControl>(new RobotControl());
+  
+  // Now shared_from_this() will work because the object is managed by shared_ptr
+  RCLCPP_INFO(node->get_logger(), "Creating MoveGroupInterface for ur_onrobot_manipulator");
+  
+  try {
+      node->move_group_ptr = std::make_unique<moveit::planning_interface::MoveGroupInterface>(
+          node, "ur_onrobot_manipulator");
+          
+      node->move_group_ptr->setMaxVelocityScalingFactor(0.01);
+      node->move_group_ptr->setMaxAccelerationScalingFactor(0.01);
+      
+      RCLCPP_INFO(node->get_logger(), "MoveGroupInterface created successfully");
+      
+  } catch (const std::exception& e) {
+      RCLCPP_ERROR(node->get_logger(), "Failed to create MoveGroupInterface: %s", e.what());
+      // You could return nullptr here or throw, depending on your error handling preference
+      throw;
+  }
+  
+  return node;
 }
 
 

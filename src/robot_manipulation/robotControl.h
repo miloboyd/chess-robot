@@ -16,11 +16,14 @@
  #include <math.h>
  #include <thread>
  #include <chrono>
+ #include <memory>
 
 
  class RobotControl : public rclcpp::Node {
 
 public:
+
+    static std::shared_ptr<RobotControl> create();
 
     /**
      * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate
