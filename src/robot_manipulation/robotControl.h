@@ -43,22 +43,25 @@ public:
      * @brief Executes pick movement, descending to piece level and clamping on piece position 
      * @returns Successful execution status 
      */
-    bool pickUpPiece();
+    bool pickUpPiece(double x_coordinate, double y_coordinate, double z_coordinate);
 
     /**
      * @brief Exectures place movement, descending to piece level and placing piece
      * @returns Successful execution status
      */
-    bool placePiece();
+    bool placePiece(double x_coordinate, double y_coordinate, double z_coordinate);
 
     void setUpPlanningScene();
+
+    void setConstraints();
 
 private:
     //initialise class member variables
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr grip_pub;
     std_msgs::msg::Float64MultiArray open;
     std_msgs::msg::Float64MultiArray close;
-    moveit::planning_interface::MoveGroupInterface move_group;
+    std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_ptr;
+    
 
 
 };

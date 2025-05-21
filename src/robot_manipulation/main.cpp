@@ -1,6 +1,8 @@
 #include "boardPos.h"
 #include "robotControl.h"
 
+
+//take in paramaters of positiosn and a boolean to represent taken status 
 int main(int argc, char** argv)
 {
   rclcpp::init(argc, argv);
