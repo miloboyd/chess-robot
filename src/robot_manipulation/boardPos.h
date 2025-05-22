@@ -14,6 +14,7 @@
 #include <iostream>
 #include <cctype>
 #include <utility>
+#include <vector>
 
 /**
  * @brief A class that allocates physical positions to chess piece grids. 
@@ -37,16 +38,16 @@ public:
     /**
      * @brief Calls for robot arm movement to manipulate chess pieces. 
      * 
-     * @param start, finish Grid positions in chess notation (e.g. A4, C6). 
-     * @param isTaken Value to identify whether capturing a piece is necessary. 
+     * @param notation String that contains the first position index, second index, and occupied Value. 
+     * Grid positions in chess notation (e.g. A4, C6). 
+     * Value to identify whether capturing a piece is necessary. 
      * 
      * @returns Boolean value on whether the operation was successful. 
      * @see robotControl, chessNotationToIndex, isPawnPromotion, placePieces.
      */
-    bool movePiece(const std::string& start, const std::string& finish, bool isTaken);
+    bool movePiece(const std::string& notation);
 
 private:
-
 
     struct Position3D {
         double x; ///< X-coordinate in the robot's workspace (in meters)
@@ -71,8 +72,6 @@ private:
 
     /** Storage locations for captured black pieces (maximum 16 pieces) */
     std::array<CapturedSquare, 16> blackCapturedPieces;
-
-
 
     /**
      * @brief Initialise chess array and physical positions. 
@@ -109,7 +108,7 @@ private:
      * @param notation A string input in chess notation (e.g. A4).
      * @returns Int of the board index that corresponds to the chess notation input.
      */
-    int chessNotationToIndex(const std::string& notation);
+    std::vector<int> chessNotationToIndex(const std::string& notation);
 
 };
 

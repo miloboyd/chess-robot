@@ -26,36 +26,58 @@ public:
     static std::shared_ptr<RobotControl> create();
 
     /**
-     * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate
+     * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate.
      */
     explicit RobotControl();
     
     /**
-     * @brief Destructor
+     * @brief Destructor that is called at the end of robot task.
      */
     ~RobotControl() = default;
 
-    /*
-     * @brief Executes robot movement command to a specified coordinate
+    /** 
+     * @brief Executes robot movement command to a specified coordinate.
      * 
      * @param x_coordinate, y_coordinate, z_coordinate Grid coordinate 
      */
     bool moveRobot(double x_coordinate, double y_coordinate, double z_coordinate);
 
     /**
-     * @brief Executes pick movement, descending to piece level and clamping on piece position 
-     * @returns Successful execution status 
+     * @brief Moves to hardcorded setup position in preparation for chess piece manipulation.
+     */
+    bool moveBoard();
+
+    /**
+     * @brief Moves to the initial home position to finish the robot turn. 
+     */
+    bool moveHome();
+
+    /**
+     * @brief Moves robot arm above chess piece positions via cartesian movement.
+     */
+    bool moveLinear();
+
+    /**
+     * @brief Executes pick movement, descending to piece level and clamping on piece position. 
+     * @returns Successful execution status. 
      */
     bool pickUpPiece(double x_coordinate, double y_coordinate, double z_coordinate);
 
     /**
-     * @brief Exectures place movement, descending to piece level and placing piece
-     * @returns Successful execution status
+     * @brief Exectures place movement, descending to piece level and placing piece.
+     * @returns Successful execution status.
      */
     bool placePiece(double x_coordinate, double y_coordinate, double z_coordinate);
 
+    /** 
+     * @brief Constructs collision obstacles in workspace to restrict robot movement.
+     * */ 
     void setUpPlanningScene();
 
+    /**
+     * @brief Restrict joint angle limits.
+     * Joint angle limits will be restricted to prevent movement behind the workspace. This is to simplify possible path planning permutations. 
+     */
     void setConstraints();
 
 private:
