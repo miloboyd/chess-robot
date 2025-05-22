@@ -16,16 +16,23 @@ int main(int argc, char** argv)
   executor.add_node(moveit); //alternative
   */
 
-  //create 
-  auto node = RobotControl::create();
+  //create robot control
+  auto robot_control = RobotControl::create();
+
+  //Create chessboard with robot dependency
+  BoardPos chess_board(robot_control); 
   rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node);
+  executor.add_node(robot_control);
   auto spinner = std::thread([&executor]() {executor.spin();});
 
-  
-  node->moveBoard();
+  //initialise robot position
+  robot_control->moveBoard();
 
-  node->moveHome();
+  std::string move = "a2b41";
+  bool success = chess_board.movePiece(move);
+
+  //finish 
+  robot_control->moveHome();
 
 
   

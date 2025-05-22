@@ -18,6 +18,28 @@ RobotControl::RobotControl() : Node("ur3e_control_node") {
 
 }
 
+std::shared_ptr<RobotControl> RobotControl::create() {
+  // Create the node using shared_ptr
+  auto node = std::shared_ptr<RobotControl>(new RobotControl());
+  
+  // Now shared_from_this() will work because the object is managed by shared_ptr
+  RCLCPP_INFO(node->get_logger(), "Creating MoveGroupInterface for ur_onrobot_manipulator");
+  
+  try {
+      node->move_group_ptr = std::make_unique<moveit::planning_interface::MoveGroupInterface>(
+          node, "ur_onrobot_manipulator");
+      
+      RCLCPP_INFO(node->get_logger(), "MoveGroupInterface created successfully");
+      
+  } catch (const std::exception& e) {
+      RCLCPP_ERROR(node->get_logger(), "Failed to create MoveGroupInterface: %s", e.what());
+      // You could return nullptr here or throw, depending on your error handling preference
+      throw;
+  }
+  
+  return node;
+}
+
 bool RobotControl::moveRobot(double x_coordinate, double y_coordinate, double z_coordinate) {
   
   RCLCPP_INFO(this->get_logger(), "Planning frame: %s", move_group_ptr->getPlanningFrame().c_str());
@@ -154,19 +176,22 @@ bool RobotControl::moveHome() {
   return true;
 }
 
-bool RobotControl::moveLinear() {
+
+
+
+bool RobotControl::moveLinear(double x_coordinate, double y_coordinate, double z_coordinate) {
   
   //set velocity parameters (cartesian movement is a little faster than normal move)
   move_group_ptr->setMaxVelocityScalingFactor(0.05);
   move_group_ptr->setMaxAccelerationScalingFactor(0.05);
 
-  geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
-  RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
-              current_pose.position.x, current_pose.position.y, current_pose.position.z);
+  geometry_msgs::msg::Pose Pose;
+  Pose.position.x = x_coordinate;
+  Pose.position.y = y_coordinate;
+  Pose.position.z = 0.074;
 
   std::vector<geometry_msgs::msg::Pose> waypoints;
-  current_pose.position.z += 0.05;
-  waypoints.push_back(current_pose);
+  waypoints.push_back(Pose);
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double jump_threshold = 0.00;
@@ -177,36 +202,8 @@ bool RobotControl::moveLinear() {
   //execute motion
   move_group_ptr->execute(trajectory);
 
+  return true;
 }
-
-
-
-void RobotControl::setConstraints() {
-  
-}
-
-std::shared_ptr<RobotControl> RobotControl::create() {
-  // Create the node using shared_ptr
-  auto node = std::shared_ptr<RobotControl>(new RobotControl());
-  
-  // Now shared_from_this() will work because the object is managed by shared_ptr
-  RCLCPP_INFO(node->get_logger(), "Creating MoveGroupInterface for ur_onrobot_manipulator");
-  
-  try {
-      node->move_group_ptr = std::make_unique<moveit::planning_interface::MoveGroupInterface>(
-          node, "ur_onrobot_manipulator");
-      
-      RCLCPP_INFO(node->get_logger(), "MoveGroupInterface created successfully");
-      
-  } catch (const std::exception& e) {
-      RCLCPP_ERROR(node->get_logger(), "Failed to create MoveGroupInterface: %s", e.what());
-      // You could return nullptr here or throw, depending on your error handling preference
-      throw;
-  }
-  
-  return node;
-}
-
 
 bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double z_coordinate) {
 
@@ -214,7 +211,7 @@ bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double 
   geometry_msgs::msg::Pose Pose;
   Pose.position.x = x_coordinate;
   Pose.position.y = y_coordinate;
-  Pose.position.z = z_coordinate;
+  Pose.position.z = 0.047;
   //define waypoint
   std::vector<geometry_msgs::msg::Pose> waypoints;
   waypoints.push_back(Pose);
@@ -231,44 +228,55 @@ bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double 
   //pick piece (grab)
   grip_pub->publish(close);
 
+  //delay movement for a little to allow gripper to close 
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+
   //cartesian path up to level to manouver to original level 
-  Pose.position.z += 0.2;
+  Pose.position.z = 0.074;
   waypoints.push_back(Pose);
   fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+
+  move_group_ptr->execute(trajectory);
 
   return true;
 }
 
 bool RobotControl::placePiece(double x_coordinate, double y_coordinate, double z_coordinate) {
-    //cartesian path down to level to grasp piece
-    geometry_msgs::msg::Pose Pose;
-    Pose.position.x = x_coordinate;
-    Pose.position.y = y_coordinate;
-    Pose.position.z = z_coordinate;
-    //define waypoint
-    std::vector<geometry_msgs::msg::Pose> waypoints;
-    waypoints.push_back(Pose);
   
-    moveit_msgs::msg::RobotTrajectory trajectory;
-    const double jump_threshold = 0.0;
-    const double eef_step = 0.01;
-    double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-    RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
-     
-    //execute motion
-    move_group_ptr->execute(trajectory);
-  
-    //pick piece (grab)
-    grip_pub->publish(open);
-  
-    //cartesian path up to level to manouver to original level 
-    Pose.position.z += 0.2;
-    waypoints.push_back(Pose);
-    fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-    RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
-  
-    return true;
+  //cartesian path down to level to grasp piece
+  geometry_msgs::msg::Pose Pose;
+  Pose.position.x = x_coordinate;
+  Pose.position.y = y_coordinate;
+  Pose.position.z = 0.047;
+  //define waypoint
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  waypoints.push_back(Pose);
+
+  moveit_msgs::msg::RobotTrajectory trajectory;
+  const double jump_threshold = 0.0;
+  const double eef_step = 0.01;
+  double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+    
+  //execute motion
+  move_group_ptr->execute(trajectory);
+
+  //pick piece (grab)
+  grip_pub->publish(open);
+
+  //delay movement for a little to allow gripper to close 
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+
+  //cartesian path up to level to manouver to original level 
+  Pose.position.z = 0.074;
+  waypoints.push_back(Pose);
+  fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+
+  move_group_ptr->execute(trajectory);
+
+  return true;
 }
 
 void RobotControl::setUpPlanningScene() {
@@ -355,4 +363,9 @@ void RobotControl::setUpPlanningScene() {
   planning_scene_interface.addCollisionObjects(collision_objects);
 
 }
+
+void RobotControl::setConstraints() {
+  
+}
+
 

@@ -15,6 +15,9 @@
 #include <cctype>
 #include <utility>
 #include <vector>
+#include <memory>
+
+class RobotControl;
 
 /**
  * @brief A class that allocates physical positions to chess piece grids. 
@@ -28,6 +31,8 @@
 class BoardPos {
 
 public:
+
+    explicit BoardPos(std::shared_ptr<RobotControl> robot_controller);
 
     /**
      * @brief Contructor that initialises the chessboard physical properties. 
@@ -48,6 +53,8 @@ public:
     bool movePiece(const std::string& notation);
 
 private:
+
+    std::shared_ptr<RobotControl> robot_control_;
 
     struct Position3D {
         double x; ///< X-coordinate in the robot's workspace (in meters)

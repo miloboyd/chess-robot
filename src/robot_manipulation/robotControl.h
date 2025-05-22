@@ -55,7 +55,7 @@ public:
     /**
      * @brief Moves robot arm above chess piece positions via cartesian movement.
      */
-    bool moveLinear();
+    bool moveLinear(double x_coordinate, double y_coordinate, double z_coordinate);
 
     /**
      * @brief Executes pick movement, descending to piece level and clamping on piece position. 

@@ -1,7 +1,13 @@
 #include "boardPos.h"
+#include "robotControl.h"
 
     // Constructor
-    BoardPos::BoardPos() {
+    BoardPos::BoardPos(std::shared_ptr<RobotControl> robot_controller) : robot_control_(robot_controller) {
+        
+        if (!robot_controller) {
+            throw std::invalid_argument("Robot controller cannot be null");
+        }
+
         initialiseBoard();
         initialiseCapturedBoards();
     }
@@ -47,7 +53,7 @@
         std::vector<int> result = chessNotationToIndex(notation);
         if (result.empty()) {
             std::cerr << "Failed to parse chess notation" << std::endl;
-            return;
+            return false;
         }
 
         int firstPos = result[0];
@@ -77,12 +83,11 @@
                 return false;
             }
 
-            /*
-            robot.moveRobot(board[finishIndex].position.x, board[finishIndex].position.y, board[finishIndex].position.z + 2);
-            robot.pickUpPiece();
-            robot.moveRobot(whiteCapturedPieces[capturedIndex].position.x, whiteCapturedPieces[capturedIndex].position.y, whiteCapturedPieces[capturedIndex].position.z + 2);
-            robot.placePiece();
-            */
+            //proceed with movement 
+            robot_control_->moveLinear(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
+            robot_control_->pickUpPiece(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
+            robot_control_->moveLinear(whiteCapturedPieces[capturedIndex].position.x,whiteCapturedPieces[capturedIndex].position.y,whiteCapturedPieces[capturedIndex].position.z);
+            robot_control_->placePiece(whiteCapturedPieces[capturedIndex].position.x,whiteCapturedPieces[capturedIndex].position.y,whiteCapturedPieces[capturedIndex].position.z);
         }
 
         //Check for pawn promotion
@@ -99,6 +104,11 @@
         robot.placePiece();
         robot.moveHome();
         */
+        //move main piece 
+        robot_control_->moveLinear(board[firstPos].position.x,board[firstPos].position.y,board[firstPos].position.z);
+        robot_control_->pickUpPiece(board[firstPos].position.x,board[firstPos].position.y,board[firstPos].position.z);
+        robot_control_->moveLinear(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
+        robot_control_->placePiece(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
 
         return true;
 
@@ -127,7 +137,7 @@
 
         char value = notation[4];
 
-        if (file < 'A' || file > 'H' || rank < '1' || rank > '8' || file2 < 'A' || file2 > 'H' || rank2 < '1' || rank2 > '8' || (value != 0 && value != 1) ) {
+        if (file < 'A' || file > 'H' || rank < '1' || rank > '8' || file2 < 'A' || file2 > 'H' || rank2 < '1' || rank2 > '8' || (value != '0' && value != '1') ) {
             std::cerr << "Invalid chess notation: " << notation << std::endl;
             return {};
         }
