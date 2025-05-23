@@ -215,7 +215,7 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
       geometry_msgs::msg::Pose waypoint;
       waypoint.position.x = current_pose.position.x + dx * progress;
       waypoint.position.y = current_pose.position.y + dy * progress;
-      waypoint.position.z = current_pose.position.z + dz * progress;
+      waypoint.position.z = current_pose.position.z;
       waypoint.orientation = locked_orientation;  // Same orientation for all waypoints
       
       waypoints.push_back(waypoint);
@@ -289,42 +289,49 @@ bool RobotControl::pickUpPiece() {
 
   geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
   geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
-  const double height = current_pose.position.z;
+  const double safe_height = current_pose.position.z; //remember safe height
+
   RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
               current_pose.position.x, current_pose.position.y, current_pose.position.z);
 
-  //cartesian path down to level to grasp piece
-  geometry_msgs::msg::Pose target_pose;
-  target_pose.position.x = current_pose.position.x;
-  target_pose.position.y = current_pose.position.y;
-  target_pose.position.z = 0.047;
-  target_pose.orientation = locked_orientation;
-  //define waypoint
-  std::vector<geometry_msgs::msg::Pose> waypoints;
-  waypoints.push_back(target_pose);
+  // STEP 1: move down to piece level
+  geometry_msgs::msg::Pose down_pose;
+  down_pose.position.x = current_pose.position.x;
+  down_pose.position.y = current_pose.position.y;
+  down_pose.position.z = 0.047; // piece level
+  down_pose.orientation = locked_orientation;
 
-  moveit_msgs::msg::RobotTrajectory trajectory;
+  std::vector<geometry_msgs::msg::Pose> down_waypoints; // New vector for down movement
+  down_waypoints.push_back(down_pose);
+
+  moveit_msgs::msg::RobotTrajectory down_trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.005;
-  double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Performing pick up operation (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
-   
-  //execute motion
-  move_group_ptr->execute(trajectory);
 
-  //pick piece (grab)
+  double fraction = move_group_ptr->computeCartesianPath(down_waypoints, eef_step, jump_threshold, down_trajectory);
+  RCLCPP_INFO(this->get_logger(), "Moving DOWN to piece (%.2f%% achieved)", fraction * 100.0); 
+  move_group_ptr->execute(down_trajectory);
+
+  //STEP 2: Close Gripper
+  RCLCPP_INFO(this->get_logger(), "Closing gripper to grab piece"); 
   grip_pub->publish(close);
+  std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay movement to allow gripper time to grab
 
-  //delay movement for a little to allow gripper to close 
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  //STEP 3: Move UP to safe height
+  geometry_msgs::msg::Pose up_pose;
+  up_pose.position.x = current_pose.position.x;
+  up_pose.position.y = current_pose.position.y;
+  up_pose.position.z = safe_height; // piece level
+  up_pose.orientation = locked_orientation;
 
-  //cartesian path up to level to manouver to original level 
-  target_pose.position.z = height;
-  waypoints.push_back(target_pose);
-  fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  std::vector<geometry_msgs::msg::Pose> up_waypoints; // New vector for down movement
+  up_waypoints.push_back(up_pose);
+
+  moveit_msgs::msg::RobotTrajectory up_trajectory;
+  fraction = move_group_ptr->computeCartesianPath(up_waypoints, eef_step, jump_threshold, up_trajectory);
   RCLCPP_INFO(this->get_logger(), "Returning (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  move_group_ptr->execute(trajectory);
+  move_group_ptr->execute(up_trajectory);
 
   return true;
 }
@@ -333,42 +340,49 @@ bool RobotControl::placePiece() {
   
   geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
   geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
-  const double height = current_pose.position.z;
+  const double safe_height = current_pose.position.z; //remember safe height
+
   RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
               current_pose.position.x, current_pose.position.y, current_pose.position.z);
 
-  //cartesian path down to level to grasp piece
-  geometry_msgs::msg::Pose target_pose;
-  target_pose.position.x = current_pose.position.x;
-  target_pose.position.y = current_pose.position.y;
-  target_pose.position.z = 0.047;
-  target_pose.orientation = locked_orientation;
-  //define waypoint
-  std::vector<geometry_msgs::msg::Pose> waypoints;
-  waypoints.push_back(target_pose);
+  // STEP 1: move down to piece level
+  geometry_msgs::msg::Pose down_pose;
+  down_pose.position.x = current_pose.position.x;
+  down_pose.position.y = current_pose.position.y;
+  down_pose.position.z = 0.047; // piece level
+  down_pose.orientation = locked_orientation;
 
-  moveit_msgs::msg::RobotTrajectory trajectory;
+  std::vector<geometry_msgs::msg::Pose> down_waypoints; // New vector for down movement
+  down_waypoints.push_back(down_pose);
+
+  moveit_msgs::msg::RobotTrajectory down_trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.005;
-  double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Performing place operation (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
-   
-  //execute motion
-  move_group_ptr->execute(trajectory);
 
-  //pick piece (grab)
+  double fraction = move_group_ptr->computeCartesianPath(down_waypoints, eef_step, jump_threshold, down_trajectory);
+  RCLCPP_INFO(this->get_logger(), "Moving DOWN to piece (%.2f%% achieved)", fraction * 100.0); 
+  move_group_ptr->execute(down_trajectory);
+
+  //STEP 2: Close Gripper
+  RCLCPP_INFO(this->get_logger(), "Closing gripper to grab piece"); 
   grip_pub->publish(open);
+  std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay movement to allow gripper time to grab
 
-  //delay movement for a little to allow gripper to close 
-  std::this_thread::sleep_for(std::chrono::seconds(2));
+  //STEP 3: Move UP to safe height
+  geometry_msgs::msg::Pose up_pose;
+  up_pose.position.x = current_pose.position.x;
+  up_pose.position.y = current_pose.position.y;
+  up_pose.position.z = safe_height; // piece level
+  up_pose.orientation = locked_orientation;
 
-  //cartesian path up to level to manouver to original level 
-  target_pose.position.z = height;
-  waypoints.push_back(target_pose);
-  fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  std::vector<geometry_msgs::msg::Pose> up_waypoints; // New vector for down movement
+  up_waypoints.push_back(up_pose);
+
+  moveit_msgs::msg::RobotTrajectory up_trajectory;
+  fraction = move_group_ptr->computeCartesianPath(up_waypoints, eef_step, jump_threshold, up_trajectory);
   RCLCPP_INFO(this->get_logger(), "Returning (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  move_group_ptr->execute(trajectory);
+  move_group_ptr->execute(up_trajectory);
 
   return true;
 }
