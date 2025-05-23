@@ -179,55 +179,135 @@ bool RobotControl::moveHome() {
 
 
 
-bool RobotControl::moveLinear(double x_coordinate, double y_coordinate, double z_coordinate) {
+bool RobotControl::moveLinear(double target_x, double target_y, double target_z) {
   
   //set velocity parameters (cartesian movement is a little faster than normal move)
-  move_group_ptr->setMaxVelocityScalingFactor(0.05);
-  move_group_ptr->setMaxAccelerationScalingFactor(0.05);
+  move_group_ptr->setMaxVelocityScalingFactor(0.02);
+  move_group_ptr->setMaxAccelerationScalingFactor(0.02);
 
+  //get current position
   geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+  geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
+
+  //produce current position in comand line 
   RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
               current_pose.position.x, current_pose.position.y, current_pose.position.z);
 
-
-  geometry_msgs::msg::Pose Pose;
-  Pose.position.x = current_pose.position.x;
-  Pose.position.y = current_pose.position.y + 0.05;
-  Pose.position.z = current_pose.position.z;
+  //calculate movement distance
+  double dx = target_x - current_pose.position.x;
+  double dy = target_y - current_pose.position.y;
+  double dz = target_z - current_pose.position.z;
+  double total_distance = sqrt(dx*dx + dy*dy + dz*dz);
+  RCLCPP_INFO(this->get_logger(), "Chess move: %.1fcm distance", total_distance * 100);
 
   std::vector<geometry_msgs::msg::Pose> waypoints;
-  waypoints.push_back(Pose);
 
-  moveit_msgs::msg::RobotTrajectory trajectory;
-  const double jump_threshold = 0.00;
-  const double eef_step = 0.01;
-  double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualising movement 1cm down (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+  if (total_distance > 0.05) {
+    
+    const double step_size = 0.03;
+    int num_steps = ceil(total_distance / step_size);
+    RCLCPP_INFO(this->get_logger(), "Large movement: creating %d waypoints", num_steps);
 
-  //execute motion
-  //moveit::planning_interface::MoveGroupInterface::Plan plan;
-  //plan.trajectory_ = trajectory;
-  move_group_ptr->execute(trajectory);
+      // Add intermediate waypoints
+    for (int i = 1; i <= num_steps; i++) {
+      double progress = (double)i / num_steps;
+      
+      geometry_msgs::msg::Pose waypoint;
+      waypoint.position.x = current_pose.position.x + dx * progress;
+      waypoint.position.y = current_pose.position.y + dy * progress;
+      waypoint.position.z = current_pose.position.z + dz * progress;
+      waypoint.orientation = locked_orientation;  // Same orientation for all waypoints
+      
+      waypoints.push_back(waypoint);
+    }
+  }
+  else {
 
-  return true;
-}
+    geometry_msgs::msg::Pose target_pose;
+    target_pose.position.x = target_x;
+    target_pose.position.y = target_y;
+    target_pose.position.z = target_z;
+    target_pose.orientation = locked_orientation; //preserve orientation;  // Same orientation for all waypoints
 
-bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double z_coordinate) {
-
-  //cartesian path down to level to grasp piece
-  geometry_msgs::msg::Pose Pose;
-  Pose.position.x = x_coordinate;
-  Pose.position.y = y_coordinate;
-  Pose.position.z = 0.047;
-  //define waypoint
-  std::vector<geometry_msgs::msg::Pose> waypoints;
-  waypoints.push_back(Pose);
+    waypoints.push_back(target_pose);
+    RCLCPP_INFO(this->get_logger(), "Small movement: single waypoint");
+  }
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
   const double eef_step = 0.01;
   double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+  RCLCPP_INFO(this->get_logger(), "Cartesian Path Planning (%.2f%% achieved)", fraction * 100.0); 
+
+  if (fraction >= 0.95) {  // Require near-perfect planning
+    
+    // SET LOOSER TOLERANCES BEFORE EXECUTION
+    move_group_ptr->setGoalPositionTolerance(0.005);    // 5mm position tolerance
+    move_group_ptr->setGoalOrientationTolerance(0.1);   // ~6 degree orientation tolerance
+    
+    RCLCPP_INFO(this->get_logger(), "Executing cartesian path with relaxed tolerances");
+    auto result = move_group_ptr->execute(trajectory);
+    
+    if (result == moveit::core::MoveItErrorCode::SUCCESS) {
+      RCLCPP_INFO(this->get_logger(), "Cartesian execution successful!");
+      
+      std::this_thread::sleep_for(std::chrono::seconds(2));
+      
+      geometry_msgs::msg::Pose new_pose = move_group_ptr->getCurrentPose().pose;
+      RCLCPP_INFO(this->get_logger(), "Position after translation: (%.3f, %.3f, %.3f)",
+                  new_pose.position.x, new_pose.position.y, new_pose.position.z);
+      return true;
+      
+    } else {
+      RCLCPP_WARN(this->get_logger(), "Cartesian execution failed, trying joint space");
+      // Fall through to joint space planning
+    }
+  }
+  RCLCPP_INFO(this->get_logger(), "Using joint space planning as fallback");
+
+  geometry_msgs::msg::Pose final_target;
+  final_target.position.x = target_x;
+  final_target.position.y = target_y;
+  final_target.position.z = target_z;
+  final_target.orientation = locked_orientation;
+
+  move_group_ptr->setPoseTarget(final_target);
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+
+  bool success = (move_group_ptr->plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success) {
+    RCLCPP_INFO(this->get_logger(), "Joint space planning successful, executing");
+    move_group_ptr->execute(plan);
+    return true;
+  } else {
+    RCLCPP_ERROR(this->get_logger(), "Both cartesian and joint space planning failed!");
+    return false;
+  }
+}
+
+bool RobotControl::pickUpPiece() {
+
+  geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+  geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
+  const double height = current_pose.position.z;
+  RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+              current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
+  //cartesian path down to level to grasp piece
+  geometry_msgs::msg::Pose target_pose;
+  target_pose.position.x = current_pose.position.x;
+  target_pose.position.y = current_pose.position.y;
+  target_pose.position.z = 0.047;
+  target_pose.orientation = locked_orientation;
+  //define waypoint
+  std::vector<geometry_msgs::msg::Pose> waypoints;
+  waypoints.push_back(target_pose);
+
+  moveit_msgs::msg::RobotTrajectory trajectory;
+  const double jump_threshold = 0.0;
+  const double eef_step = 0.005;
+  double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+  RCLCPP_INFO(this->get_logger(), "Performing pick up operation (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
    
   //execute motion
   move_group_ptr->execute(trajectory);
@@ -239,35 +319,40 @@ bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double 
   std::this_thread::sleep_for(std::chrono::seconds(2));
 
   //cartesian path up to level to manouver to original level 
-  Pose.position.z = 0.074;
-  waypoints.push_back(Pose);
+  target_pose.position.z = height;
+  waypoints.push_back(target_pose);
   fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+  RCLCPP_INFO(this->get_logger(), "Returning (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  moveit::planning_interface::MoveGroupInterface::Plan plan;
-  plan.trajectory_ = trajectory;
-  move_group_ptr->execute(plan);
+  move_group_ptr->execute(trajectory);
 
   return true;
 }
 
-bool RobotControl::placePiece(double x_coordinate, double y_coordinate, double z_coordinate) {
+bool RobotControl::placePiece() {
   
+  geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+  geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
+  const double height = current_pose.position.z;
+  RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+              current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
   //cartesian path down to level to grasp piece
-  geometry_msgs::msg::Pose Pose;
-  Pose.position.x = x_coordinate;
-  Pose.position.y = y_coordinate;
-  Pose.position.z = 0.047;
+  geometry_msgs::msg::Pose target_pose;
+  target_pose.position.x = current_pose.position.x;
+  target_pose.position.y = current_pose.position.y;
+  target_pose.position.z = 0.047;
+  target_pose.orientation = locked_orientation;
   //define waypoint
   std::vector<geometry_msgs::msg::Pose> waypoints;
-  waypoints.push_back(Pose);
+  waypoints.push_back(target_pose);
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
-  const double eef_step = 0.01;
+  const double eef_step = 0.005;
   double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
-    
+  RCLCPP_INFO(this->get_logger(), "Performing place operation (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+   
   //execute motion
   move_group_ptr->execute(trajectory);
 
@@ -278,14 +363,12 @@ bool RobotControl::placePiece(double x_coordinate, double y_coordinate, double z
   std::this_thread::sleep_for(std::chrono::seconds(2));
 
   //cartesian path up to level to manouver to original level 
-  Pose.position.z = 0.074;
-  waypoints.push_back(Pose);
+  target_pose.position.z = height;
+  waypoints.push_back(target_pose);
   fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+  RCLCPP_INFO(this->get_logger(), "Returning (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  moveit::planning_interface::MoveGroupInterface::Plan plan;
-  plan.trajectory_ = trajectory;
-  move_group_ptr->execute(plan);
+  move_group_ptr->execute(trajectory);
 
   return true;
 }
@@ -379,4 +462,21 @@ void RobotControl::setConstraints() {
   
 }
 
+bool RobotControl::moveJointSpace(double x, double y, double z) {
+  geometry_msgs::msg::Pose target_pose;
+  target_pose.position.x = x;
+  target_pose.position.y = y;
+  target_pose.position.z = z;
+  target_pose.orientation = move_group_ptr->getCurrentPose().pose.orientation;
+  
+  move_group_ptr->setPoseTarget(target_pose);
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+  
+  bool success = (move_group_ptr->plan(plan) == moveit::core::MoveItErrorCode::SUCCESS);
+  if (success) {
+    move_group_ptr->execute(plan);
+    return true;
+  }
+  return false;
+}
 

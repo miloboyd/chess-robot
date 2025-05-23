@@ -21,7 +21,7 @@
             //X: Board spans -150 to +150mm, square centers at odd values
             board[i].position.x = (-0.15 + 0.01875) + 0.0375 * (file);
             //Y: Board spans 200 to 500mm, square centers at odd values  
-            board[i].position.y = (0.2 + 0.01875) + 0.0375 * (rank); 
+            board[i].position.y = (0.13 + 0.01875) + 0.0375 * (rank); 
             board[i].position.z = 0.047;
         }
     }
@@ -35,12 +35,12 @@
 
             //40mm offset between chessboard and array
             whiteCapturedPieces[i].position.x = (-0.150 - 0.040 - 0.075 + 0.01875) + 0.0375 * row;
-            whiteCapturedPieces[i].position.y = (0.2 + 0.01875) + 0.0375 * col;
+            whiteCapturedPieces[i].position.y = (0.13 + 0.01875) + 0.0375 * col;
             whiteCapturedPieces[i].position.z = 0.047;
             whiteCapturedPieces[i].full = false;
 
             blackCapturedPieces[i].position.x = (0.150 + 0.040 + 0.01875) + 0.0375 * row;       
-            blackCapturedPieces[i].position.y = (0.2 + 0.01875) + 0.0375 * col;
+            blackCapturedPieces[i].position.y = (0.13 + 0.01875) + 0.0375 * col;
             blackCapturedPieces[i].position.z = 0.047;
             blackCapturedPieces[i].full = false;
 
@@ -85,9 +85,9 @@
 
             //proceed with movement 
             robot_control_->moveLinear(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
-            robot_control_->pickUpPiece(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
+            robot_control_->pickUpPiece();
             robot_control_->moveLinear(whiteCapturedPieces[capturedIndex].position.x,whiteCapturedPieces[capturedIndex].position.y,whiteCapturedPieces[capturedIndex].position.z);
-            robot_control_->placePiece(whiteCapturedPieces[capturedIndex].position.x,whiteCapturedPieces[capturedIndex].position.y,whiteCapturedPieces[capturedIndex].position.z);
+            robot_control_->placePiece();
         }
 
         //Check for pawn promotion
@@ -97,18 +97,11 @@
             //when pulling piece, remove taken piece type 
         }
 
-        /*
-        robot.moveRobot(board[startIndex].position.x, board[startIndex].position.y, board[startIndex].position.z + 2);
-        robot.pickUpPiece();
-        robot.moveRobot(board[finishIndex].position.x, board[finishIndex].position.y, board[finishIndex].position.z + 2);
-        robot.placePiece();
-        robot.moveHome();
-        */
         //move main piece 
         robot_control_->moveLinear(board[firstPos].position.x,board[firstPos].position.y,board[firstPos].position.z);
-        robot_control_->pickUpPiece(board[firstPos].position.x,board[firstPos].position.y,board[firstPos].position.z);
+        robot_control_->pickUpPiece();
         robot_control_->moveLinear(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
-        robot_control_->placePiece(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
+        robot_control_->placePiece();
 
         return true;
 

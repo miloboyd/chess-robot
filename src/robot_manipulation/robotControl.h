@@ -61,13 +61,13 @@ public:
      * @brief Executes pick movement, descending to piece level and clamping on piece position. 
      * @returns Successful execution status. 
      */
-    bool pickUpPiece(double x_coordinate, double y_coordinate, double z_coordinate);
+    bool pickUpPiece();
 
     /**
      * @brief Exectures place movement, descending to piece level and placing piece.
      * @returns Successful execution status.
      */
-    bool placePiece(double x_coordinate, double y_coordinate, double z_coordinate);
+    bool placePiece();
 
     /** 
      * @brief Constructs collision obstacles in workspace to restrict robot movement.
@@ -79,6 +79,8 @@ public:
      * Joint angle limits will be restricted to prevent movement behind the workspace. This is to simplify possible path planning permutations. 
      */
     void setConstraints();
+
+    bool moveJointSpace(double x, double y, double z);
 
 private:
     //initialise class member variables
