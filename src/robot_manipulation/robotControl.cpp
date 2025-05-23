@@ -12,7 +12,7 @@ RobotControl::RobotControl() : Node("ur3e_control_node") {
   );
 
   open.data = {0.05};
-  close.data = {0.025};
+  close.data = {0.005};
 
   //setUpPlanningScene();
 
