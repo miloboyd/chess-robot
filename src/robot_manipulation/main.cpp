@@ -28,8 +28,17 @@ int main(int argc, char** argv)
   //initialise robot position
   robot_control->moveBoard();
 
-  std::string move = "a2b41";
-  bool success = chess_board.movePiece(move);
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+
+  geometry_msgs::msg::Pose Pose;
+  Pose.position.x = 1;
+  Pose.position.y = 1;
+  Pose.position.z = 1;
+  robot_control->moveLinear(Pose.position.x,Pose.position.y,Pose.position.z);
+
+
+  //std::string move = "a2b41";
+  //bool success = chess_board.movePiece(move);
 
   //finish 
   robot_control->moveHome();

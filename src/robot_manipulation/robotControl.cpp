@@ -14,7 +14,7 @@ RobotControl::RobotControl() : Node("ur3e_control_node") {
   open.data = {0.05};
   close.data = {0.025};
 
-  setUpPlanningScene();
+  //setUpPlanningScene();
 
 }
 
@@ -185,21 +185,28 @@ bool RobotControl::moveLinear(double x_coordinate, double y_coordinate, double z
   move_group_ptr->setMaxVelocityScalingFactor(0.05);
   move_group_ptr->setMaxAccelerationScalingFactor(0.05);
 
+  geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+  RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+              current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
+
   geometry_msgs::msg::Pose Pose;
-  Pose.position.x = x_coordinate;
-  Pose.position.y = y_coordinate;
-  Pose.position.z = 0.074;
+  Pose.position.x = current_pose.position.x;
+  Pose.position.y = current_pose.position.y + 0.05;
+  Pose.position.z = current_pose.position.z;
 
   std::vector<geometry_msgs::msg::Pose> waypoints;
   waypoints.push_back(Pose);
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double jump_threshold = 0.00;
-  const double eef_step = 0.0005;
+  const double eef_step = 0.01;
   double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
-  RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
+  RCLCPP_INFO(this->get_logger(), "Visualising movement 1cm down (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
   //execute motion
+  //moveit::planning_interface::MoveGroupInterface::Plan plan;
+  //plan.trajectory_ = trajectory;
   move_group_ptr->execute(trajectory);
 
   return true;
@@ -237,7 +244,9 @@ bool RobotControl::pickUpPiece(double x_coordinate, double y_coordinate, double 
   fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  move_group_ptr->execute(trajectory);
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+  plan.trajectory_ = trajectory;
+  move_group_ptr->execute(plan);
 
   return true;
 }
@@ -274,7 +283,9 @@ bool RobotControl::placePiece(double x_coordinate, double y_coordinate, double z
   fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   RCLCPP_INFO(this->get_logger(), "Visualizing plan 4 (Cartesian path) (%.2f%% achieved)", fraction * 100.0); 
 
-  move_group_ptr->execute(trajectory);
+  moveit::planning_interface::MoveGroupInterface::Plan plan;
+  plan.trajectory_ = trajectory;
+  move_group_ptr->execute(plan);
 
   return true;
 }
