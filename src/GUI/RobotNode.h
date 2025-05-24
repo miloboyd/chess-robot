@@ -20,7 +20,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr estop_sub_;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr dms_sub_;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr turn_sub_;
-    rclcpp::Subscription<std_mess
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr start_sub_;
 
     // Internal state
     std::atomic<bool> estop_active_;
