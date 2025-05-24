@@ -7,6 +7,8 @@
 #include <std_msgs/msg/float64_multi_array.hpp>
 #include <std_msgs/msg/bool.hpp>
 #include <std_srvs/srv/set_bool.hpp>
+#include <mutex>
+#include <atomic>
 
 
 // Forward declarations
@@ -23,6 +25,7 @@ class GUI : public QWidget
 
 public:
     GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent = nullptr);
+    int getDifficulty();
 
 protected:
     // Event filter to handle application-wide events
@@ -69,6 +72,10 @@ private:
 
     //Start button
     QPushButton *startButton;
+
+    //mutex
+    std::atomic<int> difficulty_;
+    std::mutex state_mutex_;
 };
 
 #endif // GUI_H

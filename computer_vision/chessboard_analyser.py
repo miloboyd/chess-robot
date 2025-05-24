@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import python_chess2 as chs
+import computer_vision.depreciated.python_chess2 as chs
+#from computer_vision import python_chess3 as chs
 from computer_vision import square_processing as sp
 
 def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
@@ -12,7 +13,7 @@ def analyze_chessboard(image_path, auto_calib=True, corners=[], DEBUG=False):
         image_path (str): Path to the chessboard image
         
     Returns:
-        np.ndarray: 8x8 array where 0=empty, 1=white piece, 2=black piece
+        np.ndarray: 8x8 array where 0=empty, 1=white piece, -1=black piece
     """
     # Read the image
     img = cv2.imread(image_path)
@@ -503,8 +504,8 @@ if __name__ == "__main__":
     img1 = "chessboards/screen1.png"
     img2 = "chessboards/screen2.png"
     #move = main(img1, img2)
-    #print(move)
     main2()
+    #print(move)
     
     """
     print(board_array)

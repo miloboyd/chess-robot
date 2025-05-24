@@ -1,0 +1,15 @@
+[0.052s] Invoking command in '/home/ubuntu/git/rs2/build/rs2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3
+[0.205s] [ 20%] [34m[1mAutomatic MOC and UIC for target rs2[0m
+[1.248s] [ 20%] Built target rs2_autogen
+[1.283s] [35m[1mConsolidate compiler generated dependencies of target rs2[0m
+[1.347s] [ 40%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o[0m
+[1.350s] [ 60%] [32mBuilding CXX object CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o[0m
+[1.360s] [ 80%] [32mBuilding CXX object CMakeFiles/rs2.dir/src/main.cpp.o[0m
+[12.678s] [100%] [32m[1mLinking CXX executable rs2[0m
+[15.457s] /usr/bin/ld: CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o: in function `GUI::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)':
+[15.457s] mocs_compilation.cpp:(.text+0x66): undefined reference to `GUI::publishDifficulty()'
+[15.527s] collect2: error: ld returned 1 exit status
+[15.531s] gmake[2]: *** [CMakeFiles/rs2.dir/build.make:205: rs2] Error 1
+[15.531s] gmake[1]: *** [CMakeFiles/Makefile2:138: CMakeFiles/rs2.dir/all] Error 2
+[15.532s] gmake: *** [Makefile:146: all] Error 2
+[15.541s] Invoked command in '/home/ubuntu/git/rs2/build/rs2' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/humble /usr/bin/cmake --build /home/ubuntu/git/rs2/build/rs2 -- -j3 -l3

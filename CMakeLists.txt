@@ -42,12 +42,13 @@ set(COMMON_INCLUDE_DIRS
 # (GUI)
 # ------------------------------------------------------
 
-add_executable(rs2
+add_executable(gui
   src/main.cpp
   src/GUI/GUI.cpp
+  src/GUI/RobotNode.cpp
 )
 
-target_include_directories(rs2 PUBLIC
+target_include_directories(gui PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
   $<INSTALL_INTERFACE:include>
@@ -55,19 +56,19 @@ target_include_directories(rs2 PUBLIC
   ${std_msgs_INCLUDE_DIRS}
 )
 
-target_include_directories(rs2 PRIVATE
+target_include_directories(gui PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # Link libraries
-ament_target_dependencies(rs2
+ament_target_dependencies(gui
   rclcpp
   rclcpp_components
   std_msgs
   std_srvs
 )
 
-target_link_libraries(rs2
+target_link_libraries(gui
   Qt5::Widgets
   Qt5::Core
   Qt5::Gui
@@ -183,7 +184,7 @@ install(PROGRAMS
 
 install(
   TARGETS 
-  rs2
+  gui
   boardPos
   robotControl
   boardpos_lib

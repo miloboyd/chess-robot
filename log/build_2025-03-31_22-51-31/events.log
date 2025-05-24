@@ -1,0 +1,176 @@
+[0.000000] (-) TimerEvent: {}
+[0.001759] (rs2) JobQueued: {'identifier': 'rs2', 'dependencies': OrderedDict()}
+[0.002914] (rs2) JobStarted: {'identifier': 'rs2'}
+[0.051297] (rs2) JobProgress: {'identifier': 'rs2', 'progress': 'cmake'}
+[0.054617] (rs2) JobProgress: {'identifier': 'rs2', 'progress': 'build'}
+[0.054796] (rs2) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/ubuntu/git/rs2/build/rs2', '--', '-j3', '-l3'], 'cwd': '/home/ubuntu/git/rs2/build/rs2', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'ubuntu'), ('XDG_SESSION_TYPE', 'wayland'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/ubuntu'), ('OLDPWD', '/home/ubuntu/git'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1613'), ('SYSTEMD_EXEC_PID', '1778'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator25ef4b219e3b005583550f2b0f9f990c3'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2786'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'ubuntu'), ('JOURNAL_STREAM', '8:12709'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'ubuntu'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/ubuntu-2204:@/tmp/.ICE-unix/1740,unix/ubuntu-2204:/tmp/.ICE-unix/1740'), ('INVOCATION_ID', '68ca74f3771e46c4899439a3e685df0e'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.KUEY32'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install/rs2:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:a76631b5-acdb-410d-9a44-492945f223c9'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/ubuntu/git/rs2/build/rs2'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install/rs2:/opt/ros/humble')]), 'shell': False}
+[0.100342] (-) TimerEvent: {}
+[0.201961] (-) TimerEvent: {}
+[0.305793] (-) TimerEvent: {}
+[0.408244] (-) TimerEvent: {}
+[0.485680] (rs2) StdoutLine: {'line': b'[ 20%] \x1b[34m\x1b[1mAutomatic MOC and UIC for target rs2\x1b[0m\n'}
+[0.509399] (-) TimerEvent: {}
+[0.621424] (-) TimerEvent: {}
+[0.691575] (rs2) StdoutLine: {'line': b'[ 20%] Built target rs2_autogen\n'}
+[0.723843] (-) TimerEvent: {}
+[0.764786] (rs2) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target rs2\x1b[0m\n'}
+[0.825320] (-) TimerEvent: {}
+[0.835348] (rs2) StdoutLine: {'line': b'[ 40%] \x1b[32mBuilding CXX object CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o\x1b[0m\n'}
+[0.929356] (-) TimerEvent: {}
+[1.030206] (-) TimerEvent: {}
+[1.133566] (-) TimerEvent: {}
+[1.235531] (-) TimerEvent: {}
+[1.337526] (-) TimerEvent: {}
+[1.438195] (-) TimerEvent: {}
+[1.540175] (-) TimerEvent: {}
+[1.640708] (-) TimerEvent: {}
+[1.741734] (-) TimerEvent: {}
+[1.842444] (-) TimerEvent: {}
+[1.943810] (-) TimerEvent: {}
+[2.044850] (-) TimerEvent: {}
+[2.145658] (-) TimerEvent: {}
+[2.247218] (-) TimerEvent: {}
+[2.351440] (-) TimerEvent: {}
+[2.453593] (-) TimerEvent: {}
+[2.558270] (-) TimerEvent: {}
+[2.659798] (-) TimerEvent: {}
+[2.765403] (-) TimerEvent: {}
+[2.872202] (-) TimerEvent: {}
+[2.973833] (-) TimerEvent: {}
+[3.076640] (-) TimerEvent: {}
+[3.181081] (-) TimerEvent: {}
+[3.282277] (-) TimerEvent: {}
+[3.385137] (-) TimerEvent: {}
+[3.487586] (-) TimerEvent: {}
+[3.590152] (-) TimerEvent: {}
+[3.691487] (-) TimerEvent: {}
+[3.810287] (-) TimerEvent: {}
+[3.975942] (-) TimerEvent: {}
+[4.142307] (-) TimerEvent: {}
+[4.249418] (-) TimerEvent: {}
+[4.441608] (-) TimerEvent: {}
+[4.543321] (-) TimerEvent: {}
+[4.648721] (-) TimerEvent: {}
+[4.764925] (-) TimerEvent: {}
+[4.869565] (-) TimerEvent: {}
+[4.972755] (-) TimerEvent: {}
+[5.083659] (-) TimerEvent: {}
+[5.190087] (-) TimerEvent: {}
+[5.293246] (-) TimerEvent: {}
+[5.501498] (-) TimerEvent: {}
+[5.636347] (-) TimerEvent: {}
+[5.828940] (-) TimerEvent: {}
+[5.930244] (-) TimerEvent: {}
+[6.031555] (-) TimerEvent: {}
+[6.132661] (-) TimerEvent: {}
+[6.233758] (-) TimerEvent: {}
+[6.334538] (-) TimerEvent: {}
+[6.435823] (-) TimerEvent: {}
+[6.536696] (-) TimerEvent: {}
+[6.637264] (-) TimerEvent: {}
+[6.738001] (-) TimerEvent: {}
+[6.839401] (-) TimerEvent: {}
+[6.945680] (-) TimerEvent: {}
+[7.046848] (-) TimerEvent: {}
+[7.148385] (-) TimerEvent: {}
+[7.250255] (-) TimerEvent: {}
+[7.351261] (-) TimerEvent: {}
+[7.451945] (-) TimerEvent: {}
+[7.556439] (-) TimerEvent: {}
+[7.659284] (-) TimerEvent: {}
+[7.760305] (-) TimerEvent: {}
+[7.860873] (-) TimerEvent: {}
+[7.961726] (-) TimerEvent: {}
+[8.062497] (-) TimerEvent: {}
+[8.163554] (-) TimerEvent: {}
+[8.264423] (-) TimerEvent: {}
+[8.365281] (-) TimerEvent: {}
+[8.465762] (-) TimerEvent: {}
+[8.566835] (-) TimerEvent: {}
+[8.668405] (-) TimerEvent: {}
+[8.768900] (-) TimerEvent: {}
+[8.871543] (-) TimerEvent: {}
+[8.973668] (-) TimerEvent: {}
+[9.076193] (-) TimerEvent: {}
+[9.178193] (-) TimerEvent: {}
+[9.282443] (-) TimerEvent: {}
+[9.385800] (-) TimerEvent: {}
+[9.486747] (-) TimerEvent: {}
+[9.588516] (-) TimerEvent: {}
+[9.690772] (-) TimerEvent: {}
+[9.794538] (-) TimerEvent: {}
+[9.896690] (-) TimerEvent: {}
+[9.997536] (-) TimerEvent: {}
+[10.099428] (-) TimerEvent: {}
+[10.200641] (-) TimerEvent: {}
+[10.302528] (-) TimerEvent: {}
+[10.405654] (-) TimerEvent: {}
+[10.506613] (-) TimerEvent: {}
+[10.608374] (-) TimerEvent: {}
+[10.710272] (-) TimerEvent: {}
+[10.811569] (-) TimerEvent: {}
+[10.913788] (-) TimerEvent: {}
+[11.016740] (-) TimerEvent: {}
+[11.117785] (-) TimerEvent: {}
+[11.220310] (-) TimerEvent: {}
+[11.321665] (-) TimerEvent: {}
+[11.422742] (-) TimerEvent: {}
+[11.560576] (-) TimerEvent: {}
+[11.663264] (-) TimerEvent: {}
+[11.719609] (rs2) StdoutLine: {'line': b'[ 60%] \x1b[32m\x1b[1mLinking CXX executable rs2\x1b[0m\n'}
+[11.764227] (-) TimerEvent: {}
+[11.865233] (-) TimerEvent: {}
+[11.966324] (-) TimerEvent: {}
+[12.069789] (-) TimerEvent: {}
+[12.172456] (-) TimerEvent: {}
+[12.276299] (-) TimerEvent: {}
+[12.386263] (-) TimerEvent: {}
+[12.486749] (-) TimerEvent: {}
+[12.598221] (-) TimerEvent: {}
+[12.698916] (-) TimerEvent: {}
+[12.803342] (-) TimerEvent: {}
+[12.904369] (-) TimerEvent: {}
+[13.006542] (-) TimerEvent: {}
+[13.109403] (-) TimerEvent: {}
+[13.214376] (-) TimerEvent: {}
+[13.315242] (-) TimerEvent: {}
+[13.422010] (-) TimerEvent: {}
+[13.527319] (-) TimerEvent: {}
+[13.628244] (-) TimerEvent: {}
+[13.729332] (-) TimerEvent: {}
+[13.830664] (-) TimerEvent: {}
+[13.931462] (-) TimerEvent: {}
+[14.032448] (-) TimerEvent: {}
+[14.135380] (-) TimerEvent: {}
+[14.313558] (-) TimerEvent: {}
+[14.414553] (-) TimerEvent: {}
+[14.516244] (-) TimerEvent: {}
+[14.617602] (-) TimerEvent: {}
+[14.709840] (rs2) StdoutLine: {'line': b'[100%] Built target rs2\n'}
+[14.717785] (-) TimerEvent: {}
+[14.737442] (rs2) CommandEnded: {'returncode': 0}
+[14.742755] (rs2) JobProgress: {'identifier': 'rs2', 'progress': 'install'}
+[14.762376] (rs2) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/ubuntu/git/rs2/build/rs2'], 'cwd': '/home/ubuntu/git/rs2/build/rs2', 'env': OrderedDict([('GJS_DEBUG_TOPICS', 'JS ERROR;JS LOG'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('USER', 'ubuntu'), ('XDG_SESSION_TYPE', 'wayland'), ('SHLVL', '1'), ('LD_LIBRARY_PATH', '/usr/lib/x86_64-linux-gnu/gazebo-11/plugins:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/home/ubuntu'), ('OLDPWD', '/home/ubuntu/git'), ('DESKTOP_SESSION', 'ubuntu'), ('GIO_LAUNCHED_DESKTOP_FILE', '/usr/share/applications/terminator.desktop'), ('ROS_PYTHON_VERSION', '3'), ('GNOME_SHELL_SESSION_MODE', 'ubuntu'), ('GTK_MODULES', 'gail:atk-bridge'), ('MANAGERPID', '1613'), ('SYSTEMD_EXEC_PID', '1778'), ('DBUS_SESSION_BUS_ADDRESS', 'unix:path=/run/user/1000/bus'), ('COLORTERM', 'truecolor'), ('TERMINATOR_DBUS_NAME', 'net.tenshu.Terminator25ef4b219e3b005583550f2b0f9f990c3'), ('GIO_LAUNCHED_DESKTOP_FILE_PID', '2786'), ('IM_CONFIG_PHASE', '1'), ('WAYLAND_DISPLAY', 'wayland-0'), ('COLCON_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install'), ('ROS_DISTRO', 'humble'), ('LOGNAME', 'ubuntu'), ('JOURNAL_STREAM', '8:12709'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('XDG_SESSION_CLASS', 'user'), ('USERNAME', 'ubuntu'), ('TERM', 'xterm-256color'), ('GNOME_DESKTOP_SESSION_ID', 'this-is-deprecated'), ('ROS_LOCALHOST_ONLY', '0'), ('PATH', '/opt/ros/humble/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin'), ('SESSION_MANAGER', 'local/ubuntu-2204:@/tmp/.ICE-unix/1740,unix/ubuntu-2204:/tmp/.ICE-unix/1740'), ('INVOCATION_ID', '68ca74f3771e46c4899439a3e685df0e'), ('XDG_MENU_PREFIX', 'gnome-'), ('GNOME_SETUP_DISPLAY', ':1'), ('XDG_RUNTIME_DIR', '/run/user/1000'), ('DISPLAY', ':0'), ('TERMINATOR_DBUS_PATH', '/net/tenshu/Terminator2'), ('LANG', 'en_US.UTF-8'), ('XDG_CURRENT_DESKTOP', 'ubuntu:GNOME'), ('IBUS_DISABLE_SNOOPER', '1'), ('XMODIFIERS', '@im=ibus'), ('XDG_SESSION_DESKTOP', 'ubuntu'), ('XAUTHORITY', '/run/user/1000/.mutter-Xwaylandauth.KUEY32'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('SSH_AGENT_LAUNCHER', 'gnome-keyring'), ('SSH_AUTH_SOCK', '/run/user/1000/keyring/ssh'), ('AMENT_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install/rs2:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('TERMINATOR_UUID', 'urn:uuid:a76631b5-acdb-410d-9a44-492945f223c9'), ('QT_ACCESSIBILITY', '1'), ('GDMSESSION', 'ubuntu'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('GJS_DEBUG_OUTPUT', 'stderr'), ('QT_IM_MODULE', 'ibus'), ('PWD', '/home/ubuntu/git/rs2/build/rs2'), ('XDG_CONFIG_DIRS', '/etc/xdg/xdg-ubuntu:/etc/xdg'), ('XDG_DATA_DIRS', '/usr/share/ubuntu:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop'), ('PYTHONPATH', '/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('COLCON', '1'), ('VTE_VERSION', '6800'), ('CMAKE_PREFIX_PATH', '/home/ubuntu/ros2_ws/src/rs2/install/rs2:/opt/ros/humble')]), 'shell': False}
+[14.776876] (rs2) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[14.781845] (rs2) StdoutLine: {'line': b'-- Installing: /home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2\n'}
+[14.789841] (rs2) StdoutLine: {'line': b'-- Set runtime path of "/home/ubuntu/git/rs2/install/rs2/lib/rs2/rs2" to ""\n'}
+[14.790705] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/include/rs2\n'}
+[14.790908] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/package_run_dependencies/rs2\n'}
+[14.791594] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/parent_prefix_path/rs2\n'}
+[14.791807] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.sh\n'}
+[14.791880] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/ament_prefix_path.dsv\n'}
+[14.791933] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.sh\n'}
+[14.791985] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/environment/path.dsv\n'}
+[14.792037] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.bash\n'}
+[14.792088] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.sh\n'}
+[14.792139] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.zsh\n'}
+[14.792190] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/local_setup.dsv\n'}
+[14.792240] (rs2) StdoutLine: {'line': b'-- Installing: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.dsv\n'}
+[14.793705] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/ament_index/resource_index/packages/rs2\n'}
+[14.793899] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config.cmake\n'}
+[14.793959] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/cmake/rs2Config-version.cmake\n'}
+[14.794028] (rs2) StdoutLine: {'line': b'-- Up-to-date: /home/ubuntu/git/rs2/install/rs2/share/rs2/package.xml\n'}
+[14.798280] (rs2) CommandEnded: {'returncode': 0}
+[14.818576] (-) TimerEvent: {}
+[14.884188] (rs2) JobEnded: {'identifier': 'rs2', 'rc': 0}
+[14.886671] (-) EventReactorShutdown: {}
