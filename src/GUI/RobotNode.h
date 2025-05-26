@@ -3,6 +3,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>   
 #include <std_srvs/srv/set_bool.hpp>
 #include <mutex>
 #include <atomic>
@@ -20,14 +21,14 @@ private:
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr estop_sub_;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr dms_sub_;
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr turn_sub_;
-    rclcpp::Subscription<std_mess
+    rclcpp::Subscription<std_msgs::msg::String>::SharedPtr diff_sub_;     // difficullty slider
 
     // Internal state
     std::atomic<bool> estop_active_;
     std::atomic<bool> dms_active_;
     std::atomic<bool> is_human_turn_;
     std::atomic<bool> start_;
-    int difficulty_;
+    std::atomic<int> difficulty_;
 
     std::mutex state_mutex_;
 
@@ -39,6 +40,7 @@ private:
     void estop_callback(const std_msgs::msg::Bool::SharedPtr msg);
     void dms_callback(const std_msgs::msg::Bool::SharedPtr msg);
     void turn_callback(const std_msgs::msg::Bool::SharedPtr msg);
+    void diff_callback(const std_msgs::msg::String::SharedPtr msg);
 };
 
 #endif // ROBOT_NODE_HPP

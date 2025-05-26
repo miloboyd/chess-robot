@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "$ros2_ws/src/rs2/**",
+                "/opt/ros/humble/include/**",
+                "/usr/include/eigen3"
+            ],
+            "name": "ROS",
+            "compileCommands": "$$ros2_ws/src/rs2/build/compile_commands.json",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

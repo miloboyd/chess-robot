@@ -1,2 +1,1 @@
-source;share/rs2/environment/ament_prefix_path.sh
-source;share/rs2/environment/path.sh
+/home/ubuntu/git/rs2/build/rs2/ament_cmake_environment_hooks/local_setup.dsv

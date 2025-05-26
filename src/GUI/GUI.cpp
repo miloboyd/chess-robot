@@ -1,21 +1,5 @@
 #include "GUI.h"
 
-#include <iostream>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QSlider>
-#include <QLabel>
-#include <QPushButton>
-#include <QGroupBox>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
-#include <QFrame>
-#include <QKeyEvent>
-#include <QApplication>
-#include <QFont>
-#include <std_msgs/msg/float64_multi_array.hpp>
-#include <std_msgs/msg/bool.hpp>
-
 GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent) 
     : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isHumanTurn(true), difficulty_(0)
 {
@@ -30,6 +14,10 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     // publisher for the turn switch
     turn_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
         "ur3/turn", 10);
+
+    // publisher for the turn switch
+    diff_pub_ = node_->create_publisher<std_msgs::msg::String>(
+        "ur3/diff", 10);
 
     //initialise the start service
     start_service_client_ = node_->create_client<std_srvs::srv::SetBool>("ur3/start_signal");
@@ -163,12 +151,6 @@ void GUI::updateStatus()
     }
 }
 
-int GUI::getDifficulty() 
-{
-    std::lock_guard<std::mutex> lock(state_mutex_);
-    return difficulty_;
-}
-
 void GUI::setupUI()
 {
     // Main layout
@@ -257,13 +239,13 @@ void GUI::setupUI()
     // Difficulty slider and label
     QVBoxLayout *difficultyLayout = new QVBoxLayout();
     difficultySlider = new QSlider(Qt::Horizontal);
-    difficultySlider->setRange(0, 5);  // 6 discrete steps (0-5)
+    difficultySlider->setRange(1, 20);  // 6 discrete steps (1-20)
     difficultySlider->setTickInterval(1);
     difficultySlider->setTickPosition(QSlider::TicksBelow);
     difficultySlider->setSingleStep(1);
     difficultySlider->setPageStep(1);
     
-    difficultyLabel = new QLabel("Difficulty: 0");
+    difficultyLabel = new QLabel("Difficulty: 1");
     difficultyLabel->setAlignment(Qt::AlignCenter);
 
     difficultyLayout->addWidget(difficultySlider);
@@ -321,6 +303,11 @@ void GUI::setupUI()
             [this](rclcpp::Client<std_srvs::srv::SetBool>::SharedFuture response) {
                 if (response.get()->success) {
                     RCLCPP_INFO(node_->get_logger(), "Start acknowledged: %s", response.get()->message.c_str());
+
+                    //send difficulty over publisher
+                    auto message = std_msgs::msg::String();
+                    message.data = std::to_string(difficulty_);
+                    diff_pub_->publish(message);
                 } else {
                     RCLCPP_WARN(node_->get_logger(), "Start service call failed: %s", response.get()->message.c_str());
                 }

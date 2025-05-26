@@ -198,61 +198,61 @@ rs2_uninstall/fast:
 .PHONY : rs2_uninstall/fast
 
 #=============================================================================
-# Target rules for targets named rs2
+# Target rules for targets named gui
 
 # Build rule for target.
-rs2: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs2
-.PHONY : rs2
+gui: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gui
+.PHONY : gui
 
 # fast build rule for target.
-rs2/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/build
-.PHONY : rs2/fast
+gui/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/build
+.PHONY : gui/fast
 
 #=============================================================================
-# Target rules for targets named rs2_autogen
+# Target rules for targets named gui_autogen
 
 # Build rule for target.
-rs2_autogen: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 rs2_autogen
-.PHONY : rs2_autogen
+gui_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gui_autogen
+.PHONY : gui_autogen
 
 # fast build rule for target.
-rs2_autogen/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2_autogen.dir/build.make CMakeFiles/rs2_autogen.dir/build
-.PHONY : rs2_autogen/fast
+gui_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui_autogen.dir/build.make CMakeFiles/gui_autogen.dir/build
+.PHONY : gui_autogen/fast
 
-rs2_autogen/mocs_compilation.o: rs2_autogen/mocs_compilation.cpp.o
-.PHONY : rs2_autogen/mocs_compilation.o
+gui_autogen/mocs_compilation.o: gui_autogen/mocs_compilation.cpp.o
+.PHONY : gui_autogen/mocs_compilation.o
 
 # target to build an object file
-rs2_autogen/mocs_compilation.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.o
-.PHONY : rs2_autogen/mocs_compilation.cpp.o
+gui_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/gui_autogen/mocs_compilation.cpp.o
+.PHONY : gui_autogen/mocs_compilation.cpp.o
 
-rs2_autogen/mocs_compilation.i: rs2_autogen/mocs_compilation.cpp.i
-.PHONY : rs2_autogen/mocs_compilation.i
+gui_autogen/mocs_compilation.i: gui_autogen/mocs_compilation.cpp.i
+.PHONY : gui_autogen/mocs_compilation.i
 
 # target to preprocess a source file
-rs2_autogen/mocs_compilation.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.i
-.PHONY : rs2_autogen/mocs_compilation.cpp.i
+gui_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/gui_autogen/mocs_compilation.cpp.i
+.PHONY : gui_autogen/mocs_compilation.cpp.i
 
-rs2_autogen/mocs_compilation.s: rs2_autogen/mocs_compilation.cpp.s
-.PHONY : rs2_autogen/mocs_compilation.s
+gui_autogen/mocs_compilation.s: gui_autogen/mocs_compilation.cpp.s
+.PHONY : gui_autogen/mocs_compilation.s
 
 # target to generate assembly for a file
-rs2_autogen/mocs_compilation.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/rs2_autogen/mocs_compilation.cpp.s
-.PHONY : rs2_autogen/mocs_compilation.cpp.s
+gui_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/gui_autogen/mocs_compilation.cpp.s
+.PHONY : gui_autogen/mocs_compilation.cpp.s
 
 src/GUI/GUI.o: src/GUI/GUI.cpp.o
 .PHONY : src/GUI/GUI.o
 
 # target to build an object file
 src/GUI/GUI.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/GUI.cpp.o
 .PHONY : src/GUI/GUI.cpp.o
 
 src/GUI/GUI.i: src/GUI/GUI.cpp.i
@@ -260,7 +260,7 @@ src/GUI/GUI.i: src/GUI/GUI.cpp.i
 
 # target to preprocess a source file
 src/GUI/GUI.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/GUI.cpp.i
 .PHONY : src/GUI/GUI.cpp.i
 
 src/GUI/GUI.s: src/GUI/GUI.cpp.s
@@ -268,15 +268,39 @@ src/GUI/GUI.s: src/GUI/GUI.cpp.s
 
 # target to generate assembly for a file
 src/GUI/GUI.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/GUI/GUI.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/GUI.cpp.s
 .PHONY : src/GUI/GUI.cpp.s
+
+src/GUI/RobotNode.o: src/GUI/RobotNode.cpp.o
+.PHONY : src/GUI/RobotNode.o
+
+# target to build an object file
+src/GUI/RobotNode.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/RobotNode.cpp.o
+.PHONY : src/GUI/RobotNode.cpp.o
+
+src/GUI/RobotNode.i: src/GUI/RobotNode.cpp.i
+.PHONY : src/GUI/RobotNode.i
+
+# target to preprocess a source file
+src/GUI/RobotNode.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/RobotNode.cpp.i
+.PHONY : src/GUI/RobotNode.cpp.i
+
+src/GUI/RobotNode.s: src/GUI/RobotNode.cpp.s
+.PHONY : src/GUI/RobotNode.s
+
+# target to generate assembly for a file
+src/GUI/RobotNode.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/GUI/RobotNode.cpp.s
+.PHONY : src/GUI/RobotNode.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
 # target to build an object file
 src/main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/main.cpp.o
 .PHONY : src/main.cpp.o
 
 src/main.i: src/main.cpp.i
@@ -284,7 +308,7 @@ src/main.i: src/main.cpp.i
 
 # target to preprocess a source file
 src/main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/main.cpp.i
 .PHONY : src/main.cpp.i
 
 src/main.s: src/main.cpp.s
@@ -292,7 +316,7 @@ src/main.s: src/main.cpp.s
 
 # target to generate assembly for a file
 src/main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/rs2.dir/build.make CMakeFiles/rs2.dir/src/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/gui.dir/build.make CMakeFiles/gui.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
 # Help Target
@@ -308,16 +332,19 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... test"
-	@echo "... rs2_autogen"
+	@echo "... gui_autogen"
 	@echo "... rs2_uninstall"
 	@echo "... uninstall"
-	@echo "... rs2"
-	@echo "... rs2_autogen/mocs_compilation.o"
-	@echo "... rs2_autogen/mocs_compilation.i"
-	@echo "... rs2_autogen/mocs_compilation.s"
+	@echo "... gui"
+	@echo "... gui_autogen/mocs_compilation.o"
+	@echo "... gui_autogen/mocs_compilation.i"
+	@echo "... gui_autogen/mocs_compilation.s"
 	@echo "... src/GUI/GUI.o"
 	@echo "... src/GUI/GUI.i"
 	@echo "... src/GUI/GUI.s"
+	@echo "... src/GUI/RobotNode.o"
+	@echo "... src/GUI/RobotNode.i"
+	@echo "... src/GUI/RobotNode.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
