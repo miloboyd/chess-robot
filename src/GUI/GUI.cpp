@@ -239,7 +239,7 @@ void GUI::setupUI()
     // Difficulty slider and label
     QVBoxLayout *difficultyLayout = new QVBoxLayout();
     difficultySlider = new QSlider(Qt::Horizontal);
-    difficultySlider->setRange(1, 20);  // 6 discrete steps (1-20)
+    difficultySlider->setRange(1, 20);
     difficultySlider->setTickInterval(1);
     difficultySlider->setTickPosition(QSlider::TicksBelow);
     difficultySlider->setSingleStep(1);
