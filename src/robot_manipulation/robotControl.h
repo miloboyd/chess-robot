@@ -80,6 +80,8 @@ public:
      */
     void setConstraints();
 
+    //bool getPos();
+
     bool moveJointSpace(double x, double y, double z);
 
 private:
