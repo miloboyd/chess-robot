@@ -100,14 +100,15 @@ class Chess_Core(Node):
 
     def check_move(self):
         results = ""
-
-        input("Press Enter to analyze move...")  # Wait for key press
-
         # Analyze the previous board state (used as reference)
         if self.current_board is None or len(self.current_board) == 0:
             self.current_board, self.corners = self.game.analyze_chessboard(self.prev_img, auto_calib=False)
             print("Initialized previous board:")
             print(self.current_board)
+            return 0
+
+        input("Press Enter to analyze move...")  # Wait for key press
+
 
         # Analyze the new board state from current image
         board_array, _ = self.game.analyze_chessboard(self.current_img, auto_calib=False, corners=self.corners)
@@ -258,25 +259,35 @@ class Chess_Core(Node):
         return board_state
       
     def run_game(self):
+        if self.current_board is None or len(self.current_board) == 0:
+                self.get_logger().info('Initialising Board')
+                self.check_move()
+                print(self.current_board)
+                
         if self.turn == 0:  # player's turn
-            print("Player's turn")
-            if self.turn_toggle == 1:
-                move = self.check_move()
-                gameover = self.update_board(move)
-                self.turn = 1
-                self.turn_toggle = 0
-                return gameover
+            self.get_logger().info('Players Turn')
+            self.get_logger().info('Enter Players move')
+            move = self.check_move()
+            self.get_logger().info('Updating Board')
+            gameover = self.update_board(move)
+            self.turn = 1
+            return gameover
 
         else:  # robot's turn
-            print("Robot's turn")
+            self.get_logger().info('Robots Turn')
+            self.get_logger().info('Getting AI Move')
             move = self.get_ai_move()
+            self.get_logger().info(f"sending move: {move}")
             self.send_move_to_robot(move)
 
             # ⏳ Wait until robot has completed the move
             while not self.check_robot_completed():
-                rclpy.spin_once(self, timeout_sec=0.1)
-
+                self.get_logger().info('Waiting for robot to complete move')
+                rclpy.spin_once(self, timeout_sec=0.5)
+            self.move_flag = 0 #reset move flag
+            self.get_logger().info('robot move complete, checking board state')
             move = self.check_move()
+            self.get_logger().info('Updating Board')
             gameover = self.update_board(move)
             self.turn = 0
             return gameover
