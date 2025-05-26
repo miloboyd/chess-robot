@@ -93,6 +93,11 @@ target_include_directories(boardpos_lib PUBLIC
 ament_target_dependencies(boardpos_lib 
   rclcpp
   std_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  tf2_geometry_msgs
+  tf2_eigen
 )
 
 add_executable(boardPos
@@ -106,32 +111,60 @@ target_include_directories(boardPos PUBLIC
 ament_target_dependencies(boardPos
   rclcpp
   std_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  tf2_geometry_msgs
+  tf2_eigen
 )
 
 target_link_libraries(boardPos
   boardpos_lib
+  robotControl_lib
 )
 
 # ------------------------------------------------------
 # (robotControl)
 # ------------------------------------------------------
 
-add_executable(robotControl
+add_library(robotControl_lib
   src/robot_manipulation/robotControl.cpp
+)
+
+target_include_directories(robotControl_lib PUBLIC
+  ${COMMON_INCLUDE_DIRS}
+)
+
+ament_target_dependencies(robotControl_lib
+  rclcpp
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  tf2_geometry_msgs
+  tf2_eigen
+)
+
+add_executable(robotControl
+  src/robot_manipulation/main.cpp
+)
+
+ament_target_dependencies(robotControl
+  rclcpp
+  std_msgs
+  moveit_core
+  moveit_ros_planning
+  moveit_ros_planning_interface
+  tf2_geometry_msgs
+  tf2_eigen
 )
 
 target_include_directories(robotControl PUBLIC 
   ${COMMON_INCLUDE_DIRS}
 )
 
-ament_target_dependencies(robotControl
-  rclcpp
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  moveit_task_constructor_core
-  tf2_geometry_msgs
-  tf2_eigen
+target_link_libraries(robotControl
+  robotControl_lib
+  boardpos_lib
 )
 
 # ------------------------------------------------------
