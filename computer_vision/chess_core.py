@@ -13,6 +13,7 @@ from std_msgs.msg import String, Bool
 import time
 import tkinter as tk
 import shutil
+from std_srvs.srv import Trigger
 
 
 class Chess_Core(Node):
@@ -21,7 +22,15 @@ class Chess_Core(Node):
 
         self.subscription = self.create_subscription(Image, '/camera', self.listener_callback, 10)
         self.create_subscription(Bool, '/move_complete', self.move_done_callback, 10)
+        self.subscription = self.create_subscription(Image, 'ur3/diff', self.diff_callback, 10)
         self.publisher = self.create_publisher(String, '/send_move', 10)
+
+        #start game service
+        self.run_game_flag = False
+        self.game_phase = "INIT"
+        self.srv = self.create_service(Trigger, 'ur3/start_signal', self.start_game_callback)
+        self.create_timer(0.1, self.game_loop_timer_callback)
+
         self.bridge = CvBridge()
         self.prev_img = None
         self.current_img = None
@@ -42,9 +51,9 @@ class Chess_Core(Node):
 
         self.turn = 0
         self.turn_toggle = 1
-        self.move_flag = 1 #used to check if the robot has completed its movement 1 means move complete
+        self.move_flag = 0 #used to check if the robot has completed its movement 1 means move complete
 
-        
+        self.diff = 20
 
                 # Set the correct Stockfish binary path here
         #STOCKFISH_PATH = "/usr/games/stockfish"  # Change this based on your OS
@@ -56,7 +65,7 @@ class Chess_Core(Node):
         self.stockfish.update_engine_parameters({
             "Threads": 2, 
             "Hash": 512,
-            "Skill Level": 20  # 0 (weakest) to 20 (strongest)
+            "Skill Level": self.diff  # 0 (weakest) to 20 (strongest)
         })
         self.get_logger().info('Chess_core has launched sucessfully')
 
@@ -71,10 +80,25 @@ class Chess_Core(Node):
         except CvBridgeError as e:
             self.get_logger().error(f'Failed to convert image: {e}')
 
-    def move_done_callback(self, msg):
-        if msg.data:
-            self.get_logger().info("Robot move confirmed complete.")
-            self.move_flag = 1
+    def diff_callback(self, msg):
+        self.diff = msg
+        self.stockfish.update_engine_parameters({
+            "Threads": 2, 
+            "Hash": 512,
+            "Skill Level": self.diff  # 0 (weakest) to 20 (strongest)
+        })
+
+    # def move_done_callback(self, msg):
+    #     if msg.data:
+    #         self.get_logger().info("Robot move confirmed complete.")
+    #         self.move_flag = 1
+
+    def move_done_callback(self,msg):
+            self.move_flag = msg.data
+            if msg.data:
+                self.get_logger().info("Human move confirmed complete.")
+            else:
+                self.get_logger().info("Robot move confirmed complete.")
 
     def get_best_move(self, fen: str) -> str:
         """Takes a FEN string and returns the best move."""
@@ -100,14 +124,15 @@ class Chess_Core(Node):
 
     def check_move(self):
         results = ""
-
-        input("Press Enter to analyze move...")  # Wait for key press
-
         # Analyze the previous board state (used as reference)
         if self.current_board is None or len(self.current_board) == 0:
             self.current_board, self.corners = self.game.analyze_chessboard(self.prev_img, auto_calib=False)
             print("Initialized previous board:")
             print(self.current_board)
+            return 0
+
+        # input("Press Enter to analyze move...")  # Wait for key press
+
 
         # Analyze the new board state from current image
         board_array, _ = self.game.analyze_chessboard(self.current_img, auto_calib=False, corners=self.corners)
@@ -201,9 +226,8 @@ class Chess_Core(Node):
         msg.data = move_str
         self.publisher.publish(msg)
         self.get_logger().info(f'Published move: {move_str}')
-        self.move_flag = 0
       
-    def check_robot_completed(self):
+    def check_completed(self):
         return self.move_flag
 
     def manually_select_chess_pieces(self, initial_state=None):
@@ -258,25 +282,37 @@ class Chess_Core(Node):
         return board_state
       
     def run_game(self):
+        if self.current_board is None or len(self.current_board) == 0:
+                self.get_logger().info('Initialising Board')
+                self.check_move()
+                print(self.current_board)
+                
         if self.turn == 0:  # player's turn
-            print("Player's turn")
-            if self.turn_toggle == 1:
-                move = self.check_move()
-                gameover = self.update_board(move)
-                self.turn = 1
-                self.turn_toggle = 0
-                return gameover
+            self.get_logger().info('Players Turn')
+            self.get_logger().info('Enter Players move')
+            while not self.check_completed():       # while flag == 0
+                self.get_logger().info('Waiting for human to complete move')
+                rclpy.spin_once(self, timeout_sec=0.5)    # flag is set as 1 by GUI
+            move = self.check_move()
+            self.get_logger().info('Updating Board')
+            gameover = self.update_board(move)
+            self.turn = 1
+            return gameover
 
         else:  # robot's turn
-            print("Robot's turn")
+            self.get_logger().info('Robots Turn')
+            self.get_logger().info('Getting AI Move')
             move = self.get_ai_move()
+            self.get_logger().info(f"sending move: {move}")
             self.send_move_to_robot(move)
 
             # ⏳ Wait until robot has completed the move
-            while not self.check_robot_completed():
-                rclpy.spin_once(self, timeout_sec=0.1)
-
+            while self.check_completed():         # while flag is == 1
+                self.get_logger().info('Waiting for robot to complete move')
+                rclpy.spin_once(self, timeout_sec=0.5) # robotcontrol sends 0 for human turn
+            self.get_logger().info('robot move complete, checking board state')
             move = self.check_move()
+            self.get_logger().info('Updating Board')
             gameover = self.update_board(move)
             self.turn = 0
             return gameover
@@ -290,12 +326,15 @@ class Chess_Core(Node):
     def run_game_simulated(self):
         if self.current_board is None or len(self.current_board) == 0:
                 self.get_logger().info('Initialising Board')
-                self.current_board = self.manually_select_chess_pieces(self.current_board)
+                self.check_move_sim()
                 print(self.current_board)
                 
         if self.turn == 0:  # player's turn
             self.get_logger().info('Players Turn')
             self.get_logger().info('Enter Players move')
+            while not self.check_completed():       # while flag == 0
+                self.get_logger().info('Waiting for human to complete move')
+                rclpy.spin_once(self, timeout_sec=0.5)    # flag is set as 1 by GUI
             move = self.check_move_sim()
             self.get_logger().info('Updating Board')
             gameover = self.update_board(move)
@@ -310,10 +349,9 @@ class Chess_Core(Node):
             self.send_move_to_robot(move)
 
             # ⏳ Wait until robot has completed the move
-            while not self.check_robot_completed():
+            while self.check_completed():         # while flag is == 1
                 self.get_logger().info('Waiting for robot to complete move')
-                rclpy.spin_once(self, timeout_sec=0.5)
-            self.move_flag = 0 #reset move flag
+                rclpy.spin_once(self, timeout_sec=0.5) # robotcontrol sends 0 for human turn
             self.get_logger().info('robot move complete, checking board state')
             move = self.check_move_sim()
             self.get_logger().info('Updating Board')
@@ -327,6 +365,66 @@ class Chess_Core(Node):
             run = not self.run_game_simulated()
         self.get_logger().info('Game Complete')
 
+    def start_game_callback(self, request, response):
+        if not self.run_game_flag:
+            self.get_logger().info("Received request to start game.")
+            self.run_game_flag = True
+            response.success = True
+            response.message = "Game start flag set."
+        else:
+            response.success = False
+            response.message = "Game already running."
+        return response
+
+    def game_loop_timer_callback(self):
+        if not self.run_game_flag:
+            return
+
+        if self.game_phase == "INIT":
+            self.get_logger().info("Initializing board...")
+            self.check_move_sim()
+            print(self.current_board)
+            self.game_phase = "PLAYER_WAIT"
+
+        elif self.game_phase == "PLAYER_WAIT":
+            self.get_logger().info("Waiting for player move...")
+            if self.check_completed():  # move done
+                move = self.check_move_sim()
+                self.get_logger().info('Updating board...')
+                gameover = self.update_board(move)
+                if gameover:
+                    self.game_phase = "GAME_OVER"
+                else:
+                    self.turn = 1
+                    self.game_phase = "ROBOT_MOVE"
+
+        elif self.game_phase == "ROBOT_MOVE":
+            self.get_logger().info("Robot's turn: getting move...")
+            move = self.get_ai_move()
+            self.get_logger().info(f"sending move: {move}")
+            self.send_move_to_robot(move)
+            self.game_phase = "ROBOT_WAIT"
+
+        elif self.game_phase == "ROBOT_WAIT":
+            self.get_logger().info("Waiting for robot to complete move...")
+            if not self.check_completed():  # move done
+                self.get_logger().info("Checking board state after robot move...")
+                move = self.check_move_sim()
+                self.get_logger().info("Updating board...")
+                gameover = self.update_board(move)
+                if gameover:
+                    self.game_phase = "GAME_OVER"
+                else:
+                    self.turn = 0
+                    self.game_phase = "PLAYER_WAIT"
+
+        elif self.game_phase == "GAME_OVER":
+            self.get_logger().info("Game complete.")
+            self.run_game_flag = False
+            self.game_phase = "IDLE"
+
+
+
 def main(args=None):
     rclpy.init(args=args)
     chess_node = Chess_Core()
@@ -334,30 +432,12 @@ def main(args=None):
     chess_node.destroy_node()
     rclpy.shutdown()
 
+def main2(args=None):
+    rclpy.init(args=args)
+    chess_node = Chess_Core()
+    rclpy.spin(chess_node)  # <--- this is required for services and timers to work
+    chess_node.destroy_node()
+    rclpy.shutdown()
+
 if __name__ == "__main__":
-    main()
-
-        
-
-"""
-run order
-gui params
-initialise chess game
-start game
-
-human move
-turn button pressed
-check board position
-update board
-if game over exit
-change turn
-send current fen to ai
-recieve next move
-check if end square occupied
-send move command
-check board position
-update board
-if game over exit
-change turn
-
-"""
+    main2()

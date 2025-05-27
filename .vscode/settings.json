@@ -2,7 +2,6 @@
     "files.associations": {
         "memory": "cpp",
         "string": "cpp",
-        "chrono": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
         "cmath": "cpp",
@@ -21,6 +20,7 @@
         "strstream": "cpp",
         "bit": "cpp",
         "bitset": "cpp",
+        "chrono": "cpp",
         "codecvt": "cpp",
         "compare": "cpp",
         "complex": "cpp",
@@ -75,6 +75,4 @@
         "typeinfo": "cpp",
         "variant": "cpp"
     }
-    "cmake.sourceDirectory": "/home/sean/git/rs2/picker",
-    "python.terminal.executeInFileDir": true
 }
