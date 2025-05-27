@@ -341,42 +341,52 @@ class game:
         
         # Print analysis summary
         print(f"Detected move: {detected_move_san if detected_move_san else 'None'}")
-        print(f"Current FEN: {analyzer.board.fen()}")
+        #print(f"Current FEN: {analyzer.board.fen()}")
         print(f"Current board state:")
         print(board_visual)
         
         return results
     #######chessboard analyser methods ###############################
 
-    def analyze_chessboard(self, image_path, auto_calib=True, corners=[], DEBUG=False):
+    def analyze_chessboard(self, image_input, auto_calib=True, corners=[], DEBUG=False):
         """
         Analyze a chessboard image and return a 2D array representing the board state.
-        
+
         Args:
-            image_path (str): Path to the chessboard image
-            
+            image_input (str or np.ndarray): Image path or image array
+            auto_calib (bool): Whether to auto-calibrate corners
+            corners (list): Optional known corners
+            DEBUG (bool): Show debug image
+
         Returns:
-            np.ndarray: 8x8 array where 0=empty, 1=white piece, -1=black piece
+            np.ndarray: 8x8 board array, list: used corners
         """
-        # Read the image
-        img = cv2.imread(image_path)
-        if img is None:
-            raise ValueError(f"Could not read image at {image_path}")
+        #print(f"[DEBUG] Type of current_img: {type(image_input)}")
+
+        if isinstance(image_input, str):
+            img = cv2.imread(image_input)
+            if img is None:
+                raise ValueError(f"Could not read image at {image_input}")
+        elif isinstance(image_input, np.ndarray):
+            img = image_input
+        else:
+            raise TypeError("image_input must be a file path (str) or a NumPy image")
         
-    
-        #cv2.imshow("Original Chessboard Image", img)  # Display the image in a window
-    # Initialize approx
+            #cv2.imshow("Original Chessboard Image", img)  # Display the image in a window
+        # Initialize approx
         approx = None
-        
-        
+        #print(f"[DEBUG] Type of current_img: {type(img)}")
+
         if auto_calib == True:
-            approx, success = self.detect_blue_corners(image_path)
+            #print(f"[DEBUG] attempting to detect corners")
+            approx, success = self.detect_blue_corners(img)
             if not success:
-                approx = select_points(image_path)
+                #print(f"[DEBUG] corner detection failed, manually select corners")
+                approx = select_points(image_input)
         elif corners is not None and len(corners) > 0:
             approx = corners
         else:
-            approx = select_points(image_path)
+            approx = select_points(image_input)
 
 
         # Order the points [top-left, top-right, bottom-right, bottom-left]
@@ -488,8 +498,8 @@ class game:
                 base_y2 = (row + 1) * square_height
 
                 # Padding to zoom out (e.g. 25% of square size)
-                padding_x = square_width // 20
-                padding_y = square_height // 20
+                padding_x = square_width // 10
+                padding_y = square_height // 10
 
                 # Expand the boundaries
                 x1 = max(base_x1 - padding_x, 0)
@@ -525,58 +535,73 @@ class game:
         #plt.show()
         
         # Display the final board state
-        fig, ax = plt.subplots(figsize=(10, 10))
-        cmap = plt.cm.colors.ListedColormap(['darkgrey','white', 'lightgrey', ])
-        bounds = [-1.5, -0.5, 0.5, 1.5]
-        norm = plt.cm.colors.BoundaryNorm(bounds, cmap.N)
-        ax.imshow(board, cmap=cmap, norm=norm)
+        if DEBUG:
+            fig, ax = plt.subplots(figsize=(10, 10))
+            cmap = plt.cm.colors.ListedColormap(['darkgrey','white', 'lightgrey', ])
+            bounds = [-1.5, -0.5, 0.5, 1.5]
+            norm = plt.cm.colors.BoundaryNorm(bounds, cmap.N)
+            ax.imshow(board, cmap=cmap, norm=norm)
         
-        # Add piece labels
-        for row in range(8):
-            for col in range(8):
-                if board[row, col] == 0:
-                    text = ""
-                elif board[row, col] == 1:
-                    text = "W"
-                else:
-                    text = "B"
-                ax.text(col, row, text, ha='center', va='center', fontsize=16)
-        
-        # Add row and column labels
-        columns = 'ABCDEFGH'
-        rows = '87654321'
-        for i in range(8):
-            ax.text(i, -0.5, columns[i], ha='center', fontsize=12)
-            ax.text(-0.5, i, rows[i], va='center', fontsize=12)
-        
-        ax.set_xticks(np.arange(8) - 0.5, minor=True)
-        ax.set_yticks(np.arange(8) - 0.5, minor=True)
-        ax.grid(which='minor', color='black', linestyle='-', linewidth=2)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        ax.set_title("Chess Board State (0=Empty, 1=White, 2=Black)")
-        plt.tight_layout()
-        plt.show()
+            # Add piece labels
+            for row in range(8):
+                for col in range(8):
+                    if board[row, col] == 0:
+                        text = ""
+                    elif board[row, col] == 1:
+                        text = "W"
+                    else:
+                        text = "B"
+                    ax.text(col, row, text, ha='center', va='center', fontsize=16)
+            
+            # Add row and column labels
+            columns = 'ABCDEFGH'
+            rows = '87654321'
+            for i in range(8):
+                ax.text(i, -0.5, columns[i], ha='center', fontsize=12)
+                ax.text(-0.5, i, rows[i], va='center', fontsize=12)
+            
+            ax.set_xticks(np.arange(8) - 0.5, minor=True)
+            ax.set_yticks(np.arange(8) - 0.5, minor=True)
+            ax.grid(which='minor', color='black', linestyle='-', linewidth=2)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.set_title("Chess Board State (0=Empty, 1=White, 2=Black)")
+            plt.tight_layout()
+            plt.show()
         
         return board, approx
+    
+    """
+    def detect_blue_corners(self, image_input, show_result=False):
+        print(f"[DEBUG] detect_blue_corners received type: {type(image_input)}")
 
-    def detect_blue_corners(image_path, show_result=False):
-        img = cv2.imread(image_path)
-        if img is None:
-            raise FileNotFoundError(f"Image not found: {image_path}")
-        h, w = img.shape[:2]
-
+        if isinstance(image_input, str):
+            img = cv2.imread(image_input)
+            if img is None:
+                raise ValueError(f"Could not read image at {image_input}")
+        elif isinstance(image_input, np.ndarray):
+            img = image_input
+        else:
+            raise TypeError("image_input must be a file path (str) or a NumPy image")
+        
+        h, w = image_input.shape[:2]
         # Convert to HSV
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
         # HSV range for blue
-        lower_blue = np.array([90, 50, 50])
-        upper_blue = np.array([130, 255, 255])
+        lower_blue = np.array([0, 199, 70])
+        upper_blue = np.array([133, 255, 255])
         mask = cv2.inRange(hsv, lower_blue, upper_blue)
 
+        #cv2.imshow("Mask Only", mask)
+        #key = cv2.waitKey(1) & 0xFF
+
         # Morphological clean-up
-        kernel = np.ones((3,3), np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        #kernel = np.ones((3,3), np.uint8)
+        #mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+
+        #cv2.imshow("Mask Only", mask)
+        key = cv2.waitKey(1) & 0xFF
 
         # Find contours
         contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -590,8 +615,7 @@ class game:
         }
         max_distance = min(w, h) * 0.15  # Threshold: 15% of size
 
-        found_corners = {}
-
+        centroids = []
         for cnt in contours:
             M = cv2.moments(cnt)
             if M['m00'] == 0:
@@ -599,13 +623,23 @@ class game:
             cx = int(M['m10'] / M['m00'])
             cy = int(M['m01'] / M['m00'])
             point = (cx, cy)
+            centroids.append(point)
+            cv2.circle(img, point, 5, (255, 0, 255), 2)  # magenta
 
-            # Check if this point is close to any corner
+
+        # Match best centroid to each corner (closest only)
+        best_matches = {label: (None, float('inf')) for label in image_corners}
+
+        for point in centroids:
             for label, corner in image_corners.items():
                 dist = np.linalg.norm(np.array(point) - np.array(corner))
-                if dist < max_distance and label not in found_corners:
-                    found_corners[label] = point
-                    break
+                if dist < max_distance and dist < best_matches[label][1]:
+                    best_matches[label] = (point, dist)
+
+        found_corners = {
+            label: pt for label, (pt, dist) in best_matches.items() if pt is not None
+        }
+
 
         # Ensure all 4 corners were found
         ordered_labels = ["TL", "TR", "BL", "BR"]
@@ -640,6 +674,112 @@ class game:
         
         return ordered_points, success
 
+    """
+    def detect_blue_corners(self, image_input, show_result=False):
+        #print(f"[DEBUG] detect_blue_corners received type: {type(image_input)}")
+
+        if isinstance(image_input, str):
+            img = cv2.imread(image_input)
+            if img is None:
+                raise ValueError(f"Could not read image at {image_input}")
+        elif isinstance(image_input, np.ndarray):
+            img = image_input
+        else:
+            raise TypeError("image_input must be a file path (str) or a NumPy image")
+        
+        # Fix: Use img.shape instead of image_input.shape
+        h, w = img.shape[:2]
+        
+        # Convert to HSV
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        # HSV range for blue
+        lower_blue = np.array([0, 199, 70])
+        upper_blue = np.array([133, 255, 255])
+        mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+        # Find contours
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+        # Fix: Use correct image corner coordinates (0-indexed)
+        image_corners = {
+            "TL": (0, 0),
+            "TR": (w-1, 0),
+            "BL": (0, h-1),
+            "BR": (w-1, h-1)
+        }
+        #max_distance = min(w, h) * 0.75  # Threshold: 35% of size (increased for better detection)
+        max_distance = 800
+        
+
+        centroids = []
+        for cnt in contours:
+            M = cv2.moments(cnt)
+            if M['m00'] == 0:
+                continue
+            cx = int(M['m10'] / M['m00'])
+            cy = int(M['m01'] / M['m00'])
+            point = (cx, cy)
+            centroids.append(point)
+            #cv2.circle(img, point, 5, (255, 0, 255), 2)  # magenta
+
+        #print(f"[DEBUG] Found {len(centroids)} centroids: {centroids}")
+        #print(f"[DEBUG] Image corners: {image_corners}")
+        #print(f"[DEBUG] Max distance threshold: {max_distance}")
+
+        # Match best centroid to each corner (closest only)
+        best_matches = {label: (None, float('inf')) for label in image_corners}
+
+        for point in centroids:
+            for label, corner in image_corners.items():
+                dist = np.linalg.norm(np.array(point) - np.array(corner))
+                #print(f"[DEBUG] Distance from {point} to {label} {corner}: {dist}")
+                if dist < max_distance and dist < best_matches[label][1]:
+                    best_matches[label] = (point, dist)
+                    #print(f"[DEBUG] New best match for {label}: {point} (dist: {dist})")
+
+        found_corners = {
+            label: pt for label, (pt, dist) in best_matches.items() if pt is not None
+        }
+
+        #print(f"[DEBUG] Found corners: {found_corners}")
+
+        # Ensure all 4 corners were found
+        ordered_labels = ["TL", "TR", "BL", "BR"]
+        ordered_points = []
+
+        for lbl in ordered_labels:
+            pt = found_corners.get(lbl)
+            if pt is None:
+                ordered_points.append((np.nan, np.nan))
+            else:
+                ordered_points.append(pt)
+
+        success = all(
+            isinstance(pt, (list, tuple)) and
+            len(pt) == 2 and
+            not np.isnan(pt[0]) and
+            not np.isnan(pt[1])
+            for pt in ordered_points
+        )
+
+        #print(f"[DEBUG] Success: {success}")
+        #print(f"[DEBUG] Ordered points: {ordered_points}")
+
+        if show_result:
+            # Fix: Only draw circles for valid points
+            for point in ordered_points:
+                if not (np.isnan(point[0]) or np.isnan(point[1])):
+                    cv2.circle(img, tuple(map(int, point)), 10, (0, 255, 0), 2)
+            
+            #print("Ordered Corners (TL, TR, BL, BR):", ordered_points)
+            #cv2.imshow("Detected Corners", img)
+            #cv2.imshow("Blue Mask", mask)
+            #cv2.waitKey(0)
+            #cv2.destroyAllWindows()
+
+        return ordered_points, success
+
 def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     """
     Opens an image and allows the user to select points by clicking.
@@ -654,11 +794,17 @@ def select_points(image_path, num_points=4, max_height=900, max_width=1600):
     Returns:
     numpy.ndarray: Array of (x, y) coordinates of selected points in original image scale
     """
-    # Read the image
-    img = cv2.imread(image_path)
-    if img is None:
-        print(f"Error: Could not read image at {image_path}")
-        return None
+    print(f"[DEBUG] Type of current_img: {type(image_path)}")
+
+    if isinstance(image_path, str):
+        img = cv2.imread(image_path)
+        if img is None:
+            raise ValueError(f"Could not read image at {image_path}")
+    elif isinstance(image_path, np.ndarray):
+        img = image_path
+    else:
+        raise TypeError("image_input must be a file path (str) or a NumPy image")
+        
     
     # Get original dimensions
     original_height, original_width = img.shape[:2]

@@ -306,13 +306,13 @@ def detect_chess_piece_colour(image_input, DEBUG=False):
     output = image.copy()
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-    pink_lower = np.array([140, 50, 100])
-    pink_upper = np.array([170, 255, 255])
+    pink_lower = np.array([150, 60, 80])
+    pink_upper = np.array([179, 255, 255])
     pink_mask = cv2.inRange(hsv, pink_lower, pink_upper)
 
     # Yellow range
-    yellow_lower = np.array([20, 100, 100])
-    yellow_upper = np.array([35, 255, 255])
+    yellow_lower = np.array([20, 76, 127])
+    yellow_upper = np.array([41, 255, 255])
     yellow_mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
 
     # Decision logic
