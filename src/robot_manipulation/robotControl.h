@@ -30,7 +30,7 @@ public:
     /**
      * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate.
      */
-    explicit RobotControl(rclcpp::Node::SharedPtr node);
+    explicit RobotControl(rclcpp::Node::SharedPtr node, SafetyManager* safety_manager);
     
     /**
      * @brief Destructor that is called at the end of robot task.
@@ -84,6 +84,7 @@ public:
 private:
     //initialise class member variables
     rclcpp::Node::SharedPtr node_;
+    SafetyManager* safety_manager_;
     std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_ptr_;
     rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr grip_pub_;
 
