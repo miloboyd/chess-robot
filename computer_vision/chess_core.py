@@ -21,6 +21,8 @@ class Chess_Core(Node):
 
         self.subscription = self.create_subscription(Image, '/camera', self.listener_callback, 10)
         self.create_subscription(Bool, '/move_complete', self.move_done_callback, 10)
+
+        self.subscription = self.create_subscription(Image, 'ur3/diff', self.diff_callback, 10)
         self.publisher = self.create_publisher(String, '/send_move', 10)
         self.bridge = CvBridge()
         self.prev_img = None
@@ -44,7 +46,7 @@ class Chess_Core(Node):
         self.turn_toggle = 1
         self.move_flag = 1 #used to check if the robot has completed its movement 1 means move complete
 
-        
+        self.diff = 20
 
                 # Set the correct Stockfish binary path here
         #STOCKFISH_PATH = "/usr/games/stockfish"  # Change this based on your OS
@@ -56,7 +58,7 @@ class Chess_Core(Node):
         self.stockfish.update_engine_parameters({
             "Threads": 2, 
             "Hash": 512,
-            "Skill Level": 20  # 0 (weakest) to 20 (strongest)
+            "Skill Level": self.diff  # 0 (weakest) to 20 (strongest)
         })
         self.get_logger().info('Chess_core has launched sucessfully')
 
@@ -70,6 +72,14 @@ class Chess_Core(Node):
                 self.get_logger().info(f"Received image: {msg.width}x{msg.height}")
         except CvBridgeError as e:
             self.get_logger().error(f'Failed to convert image: {e}')
+
+    def diff_callback(self, msg):
+        self.diff = msg
+        self.stockfish.update_engine_parameters({
+            "Threads": 2, 
+            "Hash": 512,
+            "Skill Level": self.diff  # 0 (weakest) to 20 (strongest)
+        })
 
     def move_done_callback(self, msg):
         if msg.data:
