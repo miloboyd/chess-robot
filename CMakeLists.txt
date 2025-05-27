@@ -84,6 +84,8 @@ add_executable(chess_robot
   src/robot_manipulation/main.cpp
   src/robot_manipulation/robotControl.cpp
   src/robot_manipulation/boardPos.cpp
+  src/robot_manipulation/safetyManager.cpp
+  src/GUI/GUI.cpp
 )
 
 target_include_directories(chess_robot PUBLIC
@@ -92,6 +94,7 @@ target_include_directories(chess_robot PUBLIC
 
 ament_target_dependencies(chess_robot
   rclcpp
+  rclcpp_components
   std_msgs
   std_srvs
   moveit_core
@@ -101,6 +104,11 @@ ament_target_dependencies(chess_robot
   tf2_eigen
 )
 
+target_link_libraries(chess_robot
+  Qt5::Widgets
+  Qt5::Core
+  Qt5::Gui
+)
 # ------------------------------------------------------
 # (Python)
 # ------------------------------------------------------

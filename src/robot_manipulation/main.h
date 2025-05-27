@@ -20,6 +20,8 @@
 
 #include "robotControl.h"
 #include "boardPos.h"
+#include "../GUI/GUI.h"
+
 
 // Forward declarations
 class RobotControl;
@@ -42,6 +44,7 @@ private:
     // Component classes
     std::unique_ptr<RobotControl> robot_control_;
     std::unique_ptr<BoardPos> board_pos_;
+    std::unique_ptr<GUI> GUI_;
     
     
     // Atomic state variables for thread safety

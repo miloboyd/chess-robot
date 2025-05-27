@@ -22,6 +22,8 @@
 #include <std_msgs/msg/string.hpp>
 #include <mutex>
 #include <atomic>
+#include <std_srvs/srv/trigger.hpp>
+
 
 
 // Forward declarations
@@ -37,7 +39,7 @@ class GUI : public QWidget
     Q_OBJECT
 
 public:
-    GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent = nullptr);
+    GUI(rclcpp::Node::SharedPtr node, QWidget *parent = nullptr);
 
 protected:
     // Event filter to handle application-wide events
@@ -65,7 +67,7 @@ private:
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::Bool>> turn_pub_;
     std::shared_ptr<rclcpp::Subscription<std_msgs::msg::Bool>> turn_sub_;
     std::shared_ptr<rclcpp::Publisher<std_msgs::msg::String>> diff_pub_;
-    rclcpp::Client<std_srvs::srv::SetBool>::SharedPtr start_service_client_;
+    rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr start_service_client_;
     
 
     QLabel *statusLabel;

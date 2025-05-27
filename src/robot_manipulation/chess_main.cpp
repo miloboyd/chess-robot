@@ -7,15 +7,18 @@
 
  int main(int argc, char** argv) {
      rclcpp::init(argc, argv);
+     QApplication app(argc, argv);
+
      
      try {
          auto main_node = std::make_shared<Main>();
          main_node->run();
      } catch (const std::exception& e) {
          RCLCPP_ERROR(rclcpp::get_logger("chess_main"), "Fatal error: %s", e.what());
+         QApplication::quit();
+         rclcpp::shutdown();
          return 1;
      }
-     
-     rclcpp::shutdown();
+
      return 0;
  }

@@ -1,6 +1,6 @@
 #include "GUI.h"
 
-GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent) 
+GUI::GUI(rclcpp::Node::SharedPtr node, QWidget *parent) 
     : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isRobotTurn(false), difficulty_(0), started_(false)
 {
     // Create the publisher for e-stop status
@@ -23,8 +23,12 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     diff_pub_ = node_->create_publisher<std_msgs::msg::String>(
         "ur3/diff", 10);
 
+    RCLCPP_INFO(node_->get_logger(), "Before GUI create client");
+
     //initialise the start service
-    start_service_client_ = node_->create_client<std_srvs::srv::SetBool>("ur3/start_signal");
+    start_service_client_ = node_->create_client<std_srvs::srv::Trigger>("ur3/start_signal");
+
+    RCLCPP_INFO(node_->get_logger(), "After GUI create client");
 
     dms_timer_ = node_->create_wall_timer(
         std::chrono::milliseconds(100),
@@ -323,11 +327,10 @@ void GUI::setupUI()
             return;
         }
 
-        auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
-        request->data = true;  // Send "start" signal
+        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
 
         start_service_client_->async_send_request(request,
-            [this](rclcpp::Client<std_srvs::srv::SetBool>::SharedFuture response) {
+            [this](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture response) {
                 if (response.get()->success) {
                     RCLCPP_INFO(node_->get_logger(), "Start acknowledged: %s", response.get()->message.c_str());
 
