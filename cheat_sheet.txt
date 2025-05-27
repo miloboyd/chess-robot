@@ -1,0 +1,12 @@
+launch realsense node:
+ros2 launch realsense2_camera rs_launch.py
+
+launch chesscore node;
+ros2 run rs2 chess_core.py
+
+service to start game:
+ros2 service call ur3/start_signal std_srvs/srv/Trigger
+
+turn finished topic message
+ros2 topic pub --once /move_complete std_msgs/Bool '{data: True}'
+
