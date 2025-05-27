@@ -5,7 +5,8 @@ RobotNode::RobotNode()
       estop_active_(false),
       dms_active_(false),
       is_human_turn_(true),
-      start_(false)
+      start_(false)//,
+      //difficulty_(0)
 {
     // Service
     start_service_ = this->create_service<std_srvs::srv::SetBool>(
@@ -25,6 +26,10 @@ RobotNode::RobotNode()
     turn_sub_ = this->create_subscription<std_msgs::msg::Bool>(
         "ur3/turn", 10,
         std::bind(&RobotNode::turn_callback, this, std::placeholders::_1));
+
+    diff_sub_ = this->create_subscription<std_msgs::msg::String>(
+        "ur3/diff", 10,
+        std::bind(&RobotNode::diff_callback, this, std::placeholders::_1));
 
     RCLCPP_INFO(this->get_logger(), "RobotNode initialized.");
 }
@@ -47,9 +52,10 @@ void RobotNode::handle_start_service(
 
 void RobotNode::estop_callback(const std_msgs::msg::Bool::SharedPtr msg)
 {
-    if (start_) {
+    if (true || start_) {
         estop_active_.store(msg->data);
         RCLCPP_INFO(this->get_logger(), "E-Stop: %s", msg->data ? "ON" : "OFF");
+
     }
 }
 
@@ -66,5 +72,13 @@ void RobotNode::turn_callback(const std_msgs::msg::Bool::SharedPtr msg)
     if (start_) {
         is_human_turn_.store(msg->data);
         RCLCPP_INFO(this->get_logger(), "Turn: %s", msg->data ? "HUMAN" : "ROBOT");
+    }
+}
+
+void RobotNode::diff_callback(const std_msgs::msg::String::SharedPtr msg)
+{
+    if (start_) {
+        difficulty_.store(std::stoi(msg->data));
+        RCLCPP_INFO(this->get_logger(), "Difficulty: %s", msg->data.c_str());
     }
 }

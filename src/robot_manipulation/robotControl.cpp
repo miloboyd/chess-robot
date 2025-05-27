@@ -11,8 +11,8 @@ RobotControl::RobotControl() : Node("ur3e_control_node") {
     "/finger_width_controller/commands", 10
   );
 
-  open.data = {0.05};
-  close.data = {0.005};
+  open.data = {0.025};
+  close.data = {0.004};
 
   //setUpPlanningScene();
 
@@ -149,7 +149,7 @@ bool RobotControl::moveBoard() {
   move_group_ptr->setMaxAccelerationScalingFactor(0.1);
 
   //move to position to execute chess piece movement 
-  std::vector<double> set_position = {83.6*M_PI/180, -85.3*M_PI/180, 88.2*M_PI/180, -93.0*M_PI/180, -89.9*M_PI/180, -5.8*M_PI/180};
+  std::vector<double> set_position = {83.6*M_PI/180, -85.3*M_PI/180, 88.2*M_PI/180, -93.0*M_PI/180, -89.9*M_PI/180, 354.2*M_PI/180};
 
   //open gripper whilst moving to position
   grip_pub->publish(open);
@@ -168,16 +168,13 @@ bool RobotControl::moveHome() {
   move_group_ptr->setMaxVelocityScalingFactor(0.1);
   move_group_ptr->setMaxAccelerationScalingFactor(0.1);
 
-  std::vector<double> home_position = {0.0, -1.57, 0.0, -1.57, 0.0, -3.14};
+  std::vector<double> home_position = {0.0, -1.57, 0.0, -1.57, 0.0, 0.0};
   move_group_ptr->setJointValueTarget(home_position);
   move_group_ptr->move();
 
   RCLCPP_INFO(this->get_logger(), "Finishing robot turn!");
   return true;
 }
-
-
-
 
 bool RobotControl::moveLinear(double target_x, double target_y, double target_z) {
   
@@ -235,7 +232,7 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
 
   moveit_msgs::msg::RobotTrajectory trajectory;
   const double jump_threshold = 0.0;
-  const double eef_step = 0.01;
+  const double eef_step = 0.005;
   double fraction = move_group_ptr->computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
   RCLCPP_INFO(this->get_logger(), "Cartesian Path Planning (%.2f%% achieved)", fraction * 100.0); 
 
@@ -315,7 +312,7 @@ bool RobotControl::pickUpPiece() {
   //STEP 2: Close Gripper
   RCLCPP_INFO(this->get_logger(), "Closing gripper to grab piece"); 
   grip_pub->publish(close);
-  std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay movement to allow gripper time to grab
+  std::this_thread::sleep_for(std::chrono::seconds(2)); // Delay movement to allow gripper time to grab
 
   //STEP 3: Move UP to safe height
   geometry_msgs::msg::Pose up_pose;
@@ -366,7 +363,7 @@ bool RobotControl::placePiece() {
   //STEP 2: Close Gripper
   RCLCPP_INFO(this->get_logger(), "Closing gripper to grab piece"); 
   grip_pub->publish(open);
-  std::this_thread::sleep_for(std::chrono::seconds(1)); // Delay movement to allow gripper time to grab
+  std::this_thread::sleep_for(std::chrono::seconds(2)); // Delay movement to allow gripper time to grab
 
   //STEP 3: Move UP to safe height
   geometry_msgs::msg::Pose up_pose;
@@ -493,4 +490,18 @@ bool RobotControl::moveJointSpace(double x, double y, double z) {
   }
   return false;
 }
+
+/**
+bool RobotControl::getPos() {
+
+  geometry_msgs::msg::Pose current_pose = move_group_ptr->getCurrentPose().pose;
+  geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
+  const double safe_height = current_pose.position.z; //remember safe height
+
+  RCLCPP_INFO(this->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+              current_pose.position.x, current_pose.position.y, current_pose.position.z);
+
+  return true;
+}
+*/
 

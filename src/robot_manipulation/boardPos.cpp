@@ -88,6 +88,7 @@
             robot_control_->pickUpPiece();
             robot_control_->moveLinear(whiteCapturedPieces[capturedIndex].position.x,whiteCapturedPieces[capturedIndex].position.y,whiteCapturedPieces[capturedIndex].position.z);
             robot_control_->placePiece();
+            //robot_control_->pickUpPiece();
         }
 
         //Check for pawn promotion
@@ -102,6 +103,7 @@
         robot_control_->pickUpPiece();
         robot_control_->moveLinear(board[secondPos].position.x,board[secondPos].position.y,board[secondPos].position.z);
         robot_control_->placePiece();
+        //robot_control_->pickUpPiece();
 
         return true;
 
