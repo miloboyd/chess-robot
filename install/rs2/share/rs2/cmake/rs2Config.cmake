@@ -1,1 +1,0 @@
-/home/ubuntu/git/rs2/build/rs2/ament_cmake_core/rs2Config.cmake
