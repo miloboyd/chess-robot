@@ -28,7 +28,7 @@ class Chess_Core(Node):
         #start game service
         self.run_game_flag = False
         self.game_phase = "INIT"
-        self.srv = self.create_service(Trigger, 'start_game', self.start_game_callback)
+        self.srv = self.create_service(Trigger, 'ur3/start_signal', self.start_game_callback)
         self.create_timer(0.1, self.game_loop_timer_callback)
 
         self.bridge = CvBridge()
