@@ -20,7 +20,7 @@ class Chess_Core(Node):
     def __init__(self):
         super().__init__('Chess_Core')
 
-        self.subscription = self.create_subscription(Image, '/camera', self.listener_callback, 10)
+        self.subscription = self.create_subscription(Image, '/camera/color/image_raw', self.listener_callback, 10)
         self.create_subscription(Bool, '/move_complete', self.move_done_callback, 10)
         self.subscription = self.create_subscription(Image, 'ur3/diff', self.diff_callback, 10)
         self.publisher = self.create_publisher(String, '/send_move', 10)
