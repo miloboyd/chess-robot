@@ -46,6 +46,7 @@ add_executable(gui
   src/main.cpp
   src/GUI/GUI.cpp
   src/GUI/RobotNode.cpp
+  src/robot_manipulation/safetyManager.cpp
 )
 
 target_include_directories(gui PUBLIC

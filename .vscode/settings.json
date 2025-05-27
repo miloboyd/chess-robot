@@ -75,6 +75,4 @@
         "typeinfo": "cpp",
         "variant": "cpp"
     }
-    "cmake.sourceDirectory": "/home/sean/git/rs2/picker",
-    "python.terminal.executeInFileDir": true
 }
