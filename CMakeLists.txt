@@ -19,7 +19,6 @@ find_package(rclcpp_components REQUIRED)
 find_package(moveit_core REQUIRED)
 find_package(moveit_ros_planning REQUIRED)
 find_package(moveit_ros_planning_interface REQUIRED)
-find_package(moveit_task_constructor_core REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(tf2_eigen REQUIRED)
 
@@ -46,6 +45,7 @@ add_executable(gui
   src/main.cpp
   src/GUI/GUI.cpp
   src/GUI/RobotNode.cpp
+  src/robot_manipulation/safetyManager.cpp
 )
 
 target_include_directories(gui PUBLIC
