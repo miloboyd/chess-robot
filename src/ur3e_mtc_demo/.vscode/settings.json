@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "cstdarg": "cpp",
-        "cstddef": "cpp",
-        "cstdio": "cpp",
-        "cstdint": "cpp"
-    }
-}
