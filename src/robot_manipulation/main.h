@@ -21,6 +21,7 @@
 #include "robotControl.h"
 #include "boardPos.h"
 #include "../GUI/GUI.h"
+#include "safetyManager.h"
 
 
 // Forward declarations
@@ -45,6 +46,7 @@ private:
     std::unique_ptr<RobotControl> robot_control_;
     std::unique_ptr<BoardPos> board_pos_;
     std::unique_ptr<GUI> GUI_;
+    std::unique_ptr<SafetyManager> safety_manager_;
     
     
     // Atomic state variables for thread safety

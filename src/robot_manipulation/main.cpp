@@ -64,15 +64,20 @@ Main::Main() : Node("chess_robot_node") {
 }
 
 void Main::run() {
-  // Initialize robot (separate from constructor to handle MoveIt timing issues)
+  
+  //make safety manager
+  safety_manager_ = std::make_unique<SafetyManager>(shared_from_this());
 
-  robot_control_ = std::make_unique<RobotControl>(shared_from_this());
+  // Initialize robot (separate from constructor to handle MoveIt timing issues)
+  robot_control_ = std::make_unique<RobotControl>(shared_from_this(), safety_manager_.get());
   RCLCPP_INFO(this->get_logger(), "Creating robot controller...");
 
   if (!initialiseRobot()) {
       RCLCPP_ERROR(this->get_logger(), "Failed to initialize robot");
       return;
   }
+
+  
   
   // Create GUI in main thread (Qt requirement)
   RCLCPP_INFO(this->get_logger(), "Creating GUI in main thread");
