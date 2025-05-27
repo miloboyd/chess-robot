@@ -78,93 +78,27 @@ target_link_libraries(gui
 # ROBOT_MANIPULATION
 # ------------------------------------------------------
 
-# ------------------------------------------------------
-# (boardPos)
-# ------------------------------------------------------
 
-add_library(boardpos_lib
+add_executable(chess_robot
+  src/robot_manipulation/chess_main.cpp
+  src/robot_manipulation/main.cpp
+  src/robot_manipulation/robotControl.cpp
   src/robot_manipulation/boardPos.cpp
 )
 
-target_include_directories(boardpos_lib PUBLIC
+target_include_directories(chess_robot PUBLIC
   ${COMMON_INCLUDE_DIRS}
 )
 
-ament_target_dependencies(boardpos_lib 
+ament_target_dependencies(chess_robot
   rclcpp
   std_msgs
+  std_srvs
   moveit_core
   moveit_ros_planning
   moveit_ros_planning_interface
   tf2_geometry_msgs
   tf2_eigen
-)
-
-add_executable(boardPos
-  src/robot_manipulation/boardTester.cpp
-)
-
-target_include_directories(boardPos PUBLIC
-  ${COMMON_INCLUDE_DIRS}
-)
-
-ament_target_dependencies(boardPos
-  rclcpp
-  std_msgs
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  tf2_geometry_msgs
-  tf2_eigen
-)
-
-target_link_libraries(boardPos
-  boardpos_lib
-  robotControl_lib
-)
-
-# ------------------------------------------------------
-# (robotControl)
-# ------------------------------------------------------
-
-add_library(robotControl_lib
-  src/robot_manipulation/robotControl.cpp
-)
-
-target_include_directories(robotControl_lib PUBLIC
-  ${COMMON_INCLUDE_DIRS}
-)
-
-ament_target_dependencies(robotControl_lib
-  rclcpp
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  tf2_geometry_msgs
-  tf2_eigen
-)
-
-add_executable(robotControl
-  src/robot_manipulation/main.cpp
-)
-
-ament_target_dependencies(robotControl
-  rclcpp
-  std_msgs
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  tf2_geometry_msgs
-  tf2_eigen
-)
-
-target_include_directories(robotControl PUBLIC 
-  ${COMMON_INCLUDE_DIRS}
-)
-
-target_link_libraries(robotControl
-  robotControl_lib
-  boardpos_lib
 )
 
 # ------------------------------------------------------
@@ -185,9 +119,10 @@ install(PROGRAMS
 install(
   TARGETS 
   gui
-  boardPos
-  robotControl
-  boardpos_lib
+  chess_robot
+  #boardPos
+  #robotControl
+  #boardpos_lib
   #LIBRARY LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
