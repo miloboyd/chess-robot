@@ -6,56 +6,45 @@
  */
 
 
- #ifndef ROBOT_CONTROL_H
- #define ROBOT_CONTROL_H
+#ifndef ROBOT_CONTROL_H
+#define ROBOT_CONTROL_H
 
- #include <rclcpp/rclcpp.hpp>
- #include <moveit/move_group_interface/move_group_interface.h>
- #include <moveit/planning_scene_interface/planning_scene_interface.h>
- #include <std_msgs/msg/float64_multi_array.hpp>
- #include <math.h>
- #include <thread>
- #include <chrono>
- #include <memory>
+#include <rclcpp/rclcpp.hpp>
+#include <moveit/move_group_interface/move_group_interface.h>
+#include <moveit/planning_scene_interface/planning_scene_interface.h>
+#include <std_msgs/msg/float64_multi_array.hpp>
+#include <geometry_msgs/msg/pose.hpp>
+#include <math.h>
+#include <thread>
+#include <chrono>
+#include <memory>
+#include <atomic>
+#include <vector>
 
 
- class RobotControl : public rclcpp::Node {
+
+class RobotControl {
 
 public:
-
-    static std::shared_ptr<RobotControl> create();
 
     /**
      * @brief Constructor that receives the nodes for the robot gripper and ur3e arm to manipulate.
      */
-    explicit RobotControl();
+    explicit RobotControl(rclcpp::Node::SharedPtr node);
     
     /**
      * @brief Destructor that is called at the end of robot task.
      */
     ~RobotControl() = default;
 
-    /** 
-     * @brief Executes robot movement command to a specified coordinate.
-     * 
-     * @param x_coordinate, y_coordinate, z_coordinate Grid coordinate 
-     */
-    bool moveRobot(double x_coordinate, double y_coordinate, double z_coordinate);
+    bool initialise();
 
-    /**
-     * @brief Moves to hardcorded setup position in preparation for chess piece manipulation.
-     */
-    bool moveBoard();
-
-    /**
-     * @brief Moves to the initial home position to finish the robot turn. 
-     */
-    bool moveHome();
+//////////////////////MOVEMENT COMMANDS//////////////////////
 
     /**
      * @brief Moves robot arm above chess piece positions via cartesian movement.
      */
-    bool moveLinear(double x_coordinate, double y_coordinate, double z_coordinate);
+    bool moveLinear(double x, double y, double z);
 
     /**
      * @brief Executes pick movement, descending to piece level and clamping on piece position. 
@@ -69,6 +58,16 @@ public:
      */
     bool placePiece();
 
+    /**
+     * @brief Moves to hardcorded setup position in preparation for chess piece manipulation.
+     */
+    bool moveBoard();
+
+    /**
+     * @brief Moves to the initial home position to finish the robot turn. 
+     */
+    bool moveHome();
+
     /** 
      * @brief Constructs collision obstacles in workspace to restrict robot movement.
      * */ 
@@ -80,19 +79,20 @@ public:
      */
     void setConstraints();
 
-    //bool getPos();
 
-    bool moveJointSpace(double x, double y, double z);
 
 private:
     //initialise class member variables
-    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr grip_pub;
-    std_msgs::msg::Float64MultiArray open;
-    std_msgs::msg::Float64MultiArray close;
-    std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_ptr;
-    
+    rclcpp::Node::SharedPtr node_;
+    std::unique_ptr<moveit::planning_interface::MoveGroupInterface> move_group_ptr_;
+    rclcpp::Publisher<std_msgs::msg::Float64MultiArray>::SharedPtr grip_pub_;
 
+    std_msgs::msg::Float64MultiArray open_;
+    std_msgs::msg::Float64MultiArray close_;
 
+    bool executeCartesianPath(const std::vector<geometry_msgs::msg::Pose>& waypoints);
+    bool executeJointSpacePlan(const geometry_msgs::msg::Pose& target);
+    void setupMoveItParameters();
 };
 
  #endif // ROBOT_CONTROL_H

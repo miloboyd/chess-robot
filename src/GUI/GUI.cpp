@@ -1,7 +1,7 @@
 #include "GUI.h"
 
-GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent) 
-    : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isHumanTurn(true), difficulty_(0)
+GUI::GUI(rclcpp::Node::SharedPtr node, QWidget *parent) 
+    : QWidget(parent), node_(node), estopActive(false), spacePressed(false), isRobotTurn(false), difficulty_(0), started_(false)
 {
     // Create the publisher for e-stop status
     estop_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
@@ -13,14 +13,27 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
 
     // publisher for the turn switch
     turn_pub_ = node_->create_publisher<std_msgs::msg::Bool>(
-        "ur3/turn", 10);
+        "/move_complete", 10);
+
+    turn_sub_ = node_->create_subscription<std_msgs::msg::Bool>(
+        "/move_complete", 10,
+        std::bind(&GUI::turn_callback, this, std::placeholders::_1));
 
     // publisher for the turn switch
     diff_pub_ = node_->create_publisher<std_msgs::msg::String>(
         "ur3/diff", 10);
 
+    RCLCPP_INFO(node_->get_logger(), "Before GUI create client");
+
     //initialise the start service
-    start_service_client_ = node_->create_client<std_srvs::srv::SetBool>("ur3/start_signal");
+    start_service_client_ = node_->create_client<std_srvs::srv::Trigger>("ur3/start_signal");
+
+    RCLCPP_INFO(node_->get_logger(), "After GUI create client");
+
+    dms_timer_ = node_->create_wall_timer(
+        std::chrono::milliseconds(100),
+        std::bind(&GUI::publishDMSState, this)
+    );
         
     // Set up the UI
     setupUI();
@@ -32,6 +45,15 @@ GUI::GUI(std::shared_ptr<rclcpp::Node> node, QWidget *parent)
     QApplication::instance()->installEventFilter(this);
 
     RCLCPP_INFO(node_->get_logger(), "GUI initialized.");
+}
+
+void GUI::publishDMSState()
+{
+    if (started_) {
+        auto message = std_msgs::msg::Bool();
+        message.data = spacePressed;
+        dms_pub_->publish(message);
+    }
 }
 
 bool GUI::eventFilter(QObject *obj, QEvent *event)
@@ -53,6 +75,7 @@ bool GUI::eventFilter(QObject *obj, QEvent *event)
             return true; // Event handled
         }
     }
+
     // Standard event processing
     return QObject::eventFilter(obj, event);
 }
@@ -60,17 +83,11 @@ bool GUI::eventFilter(QObject *obj, QEvent *event)
 void GUI::updateMasterControlStatus(bool active)
 {
     if (active)  {
-        auto message = std_msgs::msg::Bool();
-        message.data = true;
-        dms_pub_->publish(message);
 
         masterControlBar->setStyleSheet("background-color: #4CAF50; border-radius: 5px;"); // Green
         masterControlLabel->setText("Robot Movement Master Control: ACTIVE");
 
     } else {
-        auto message = std_msgs::msg::Bool();
-        message.data = false;
-        dms_pub_->publish(message);
 
 
         masterControlBar->setStyleSheet("background-color: #F44336; border-radius: 5px;"); // Red
@@ -81,25 +98,38 @@ void GUI::updateMasterControlStatus(bool active)
     updateStatus();
 }
 
+void GUI::turn_callback(const std_msgs::msg::Bool::SharedPtr msg)
+{
+    if (msg->data == false) {
+        toggleTurn();
+    }
+}
+
 void GUI::toggleTurn()
 {
-    isHumanTurn = !isHumanTurn;
-    
-    if (isHumanTurn) {
-        auto message = std_msgs::msg::Bool();
-        message.data = true;
-        turn_pub_->publish(message);
+    if (started_) {
+        isRobotTurn = !isRobotTurn;
 
-        turnButton->setText("Human Turn");
-        turnIndicator->setStyleSheet("background-color: #4CAF50; border: 2px solid #2E7D32; border-radius: 20px; opacity: 0.8;"); // Green with faded border
-    } else {
-        auto message = std_msgs::msg::Bool();
-        message.data = false;
-        turn_pub_->publish(message);
+        if (!isRobotTurn) {
+            //auto message = std_msgs::msg::Bool();
+            //message.data = true;
+            //turn_pub_->publish(message);  
+            if (!estopActive) {turnButton->setEnabled(true);}
+                
+            turnButton->setText("Human Turn");
+            turnIndicator->setStyleSheet("background-color: #4CAF50; border: 2px solid #2E7D32; border-radius: 20px; opacity: 0.8;"); // Green with faded border
+        } else {
+            auto message = std_msgs::msg::Bool();
+            message.data = true;
+            turn_pub_->publish(message);
 
-        turnButton->setText("Robot Turn");
-        turnIndicator->setStyleSheet("background-color: #F44336; border: 2px solid #B71C1C; border-radius: 20px; opacity: 0.8;"); // Red with faded border
+            turnButton->setEnabled(false);
+            turnButton->setText("Robot Turn");
+            turnIndicator->setStyleSheet("background-color: #F44336; border: 2px solid #B71C1C; border-radius: 20px; opacity: 0.8;"); // Red with faded border
+        }
     }
+
+    
 
     // Update status message
     updateStatus();
@@ -107,44 +137,48 @@ void GUI::toggleTurn()
 
 void GUI::toggleEStop()
 {
-    estopActive = !estopActive;
-    
-    if (estopActive) {
-        estopIndicator->setStyleSheet("background-color: #F44336; border-radius: 20px;"); // Red
-        estopLabel->setText("ESTOP ON");
+    if (started_) {
+        estopActive = !estopActive;
+        
+        if (estopActive) {
+            estopIndicator->setStyleSheet("background-color: #F44336; border-radius: 20px;"); // Red
+            estopLabel->setText("ESTOP ON");
 
-        // Disable and gray out turn button
-        turnButton->setEnabled(false);
-        turnButton->setStyleSheet("background-color: grey; color: white; font-weight: bold; font-size: 16px; border-radius: 10px;");
+            // Disable and gray out turn button
+            turnButton->setEnabled(false);
+            //turnButton->setStyleSheet("background-color: grey; color: white; font-weight: bold; font-size: 16px; border-radius: 10px;");
 
-        if (!isHumanTurn) {
-            toggleTurn();
+            // if (!isRobotTurn) {
+            //     toggleTurn();
+            // }
+        } else {
+            estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 20px;"); // Green
+            estopLabel->setText("ESTOP OFF");
+
+            // Re-enable turn button and restore style
+            if (!isRobotTurn) {
+                turnButton->setEnabled(true);
+                turnButton->setStyleSheet("font-weight: bold; font-size: 16px;");
+            }
         }
-    } else {
-        estopIndicator->setStyleSheet("background-color: #4CAF50; border-radius: 20px;"); // Green
-        estopLabel->setText("ESTOP OFF");
+        
+        // Publish E-Stop status
+        auto message = std_msgs::msg::Bool();
+        message.data = estopActive;
+        estop_pub_->publish(message);
 
-        // Re-enable turn button and restore style
-        turnButton->setEnabled(true);
-        turnButton->setStyleSheet("font-weight: bold; font-size: 16px;");
+        // Update status message
+        updateStatus();
     }
-    
-    // Publish E-Stop status
-    auto message = std_msgs::msg::Bool();
-    message.data = estopActive;
-    estop_pub_->publish(message);
-
-    // Update status message
-    updateStatus();
 }
 
 void GUI::updateStatus()
 {
     if (estopActive) {
         statusLabel->setText("Emergency Stop Activated! Press Estop again to reset");
-    } else if (!isHumanTurn && !spacePressed) {
+    } else if (isRobotTurn && !spacePressed) {
         statusLabel->setText("Hold Dead Man's Switch to enable movement");
-    } else if (!isHumanTurn && spacePressed) {
+    } else if (isRobotTurn && spacePressed) {
         statusLabel->setText("CAUTION - robot is currently executing its turn");
     } else {
         statusLabel->setText("Ready - Human turn");
@@ -239,7 +273,7 @@ void GUI::setupUI()
     // Difficulty slider and label
     QVBoxLayout *difficultyLayout = new QVBoxLayout();
     difficultySlider = new QSlider(Qt::Horizontal);
-    difficultySlider->setRange(1, 20);  // 6 discrete steps (1-20)
+    difficultySlider->setRange(1, 20);
     difficultySlider->setTickInterval(1);
     difficultySlider->setTickPosition(QSlider::TicksBelow);
     difficultySlider->setSingleStep(1);
@@ -293,14 +327,10 @@ void GUI::setupUI()
             return;
         }
 
-
-        startButton->setEnabled(false);
-        difficultySlider->setEnabled(false);
-        auto request = std::make_shared<std_srvs::srv::SetBool::Request>();
-        request->data = true;  // Send "start" signal
+        auto request = std::make_shared<std_srvs::srv::Trigger::Request>();
 
         start_service_client_->async_send_request(request,
-            [this](rclcpp::Client<std_srvs::srv::SetBool>::SharedFuture response) {
+            [this](rclcpp::Client<std_srvs::srv::Trigger>::SharedFuture response) {
                 if (response.get()->success) {
                     RCLCPP_INFO(node_->get_logger(), "Start acknowledged: %s", response.get()->message.c_str());
 
@@ -308,6 +338,10 @@ void GUI::setupUI()
                     auto message = std_msgs::msg::String();
                     message.data = std::to_string(difficulty_);
                     diff_pub_->publish(message);
+
+                    started_ = true;
+                    startButton->setEnabled(false);
+                    difficultySlider->setEnabled(false);
                 } else {
                     RCLCPP_WARN(node_->get_logger(), "Start service call failed: %s", response.get()->message.c_str());
                 }

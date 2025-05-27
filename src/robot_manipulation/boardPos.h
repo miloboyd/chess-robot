@@ -17,7 +17,7 @@
 #include <vector>
 #include <memory>
 
-class RobotControl;
+
 
 /**
  * @brief A class that allocates physical positions to chess piece grids. 
@@ -32,13 +32,13 @@ class BoardPos {
 
 public:
 
-    explicit BoardPos(std::shared_ptr<RobotControl> robot_controller);
-
     /**
      * @brief Contructor that initialises the chessboard physical properties. 
      * Initialises the chessboard and captured chessboard positions with respect to the robot arm base.  
      */
     BoardPos();
+
+    ~BoardPos() = default;
 
     /**
      * @brief Calls for robot arm movement to manipulate chess pieces. 
@@ -52,15 +52,38 @@ public:
      */
     bool movePiece(const std::string& notation);
 
-private:
-
-    std::shared_ptr<RobotControl> robot_control_;
-
     struct Position3D {
         double x; ///< X-coordinate in the robot's workspace (in meters)
         double y; ///< Y-coordinate in the robot's workspace (in meters)
         double z; ///< Z-coordinate or height in the robot's workspace (in meters)
     };
+
+    /**
+     * @brief Checks for pawn promotion instance.
+     * 
+     * This method performs operations to assess whether a pawn can be promoted at the opposite end of the grid to a higher order piece. The robot can choose 
+     * what piece the pawn will be replaced with. 
+     * 
+     * @param destinationIndex Index will determine the grid position and eligibility.
+     * @returns Eligbility of pawn promotion case.
+     */
+    bool isPawnPromotion(int destinationIndex);
+
+    /**
+     * @brief Transforms chess notation to board index.
+     * 
+     * This method takes chess notation as an input and transforms the grid position into an index that corresponds to an 8x8 array 
+     * flattened into a 1x64 array.
+     * 
+     * @param notation A string input in chess notation (e.g. A4).
+     * @returns Int of the board index that corresponds to the chess notation input.
+     */
+    std::vector<int> chessNotationToIndex(const std::string& notation);
+
+    Position3D getCapturedPiecePosition();
+    Position3D getBoardPosition(int index);
+
+private:
 
     struct Square {
         Position3D position; ///< 3D position of this chess square in the robot's workspace
@@ -94,28 +117,6 @@ private:
      * adjacent to the chessboard and each board contains either white or black pieces. 
      */
     void initialiseCapturedBoards();
-    
-    /**
-     * @brief Checks for pawn promotion instance.
-     * 
-     * This method performs operations to assess whether a pawn can be promoted at the opposite end of the grid to a higher order piece. The robot can choose 
-     * what piece the pawn will be replaced with. 
-     * 
-     * @param destinationIndex Index will determine the grid position and eligibility.
-     * @returns Eligbility of pawn promotion case.
-     */
-    bool isPawnPromotion(int destinationIndex);
-
-    /**
-     * @brief Transforms chess notation to board index.
-     * 
-     * This method takes chess notation as an input and transforms the grid position into an index that corresponds to an 8x8 array 
-     * flattened into a 1x64 array.
-     * 
-     * @param notation A string input in chess notation (e.g. A4).
-     * @returns Int of the board index that corresponds to the chess notation input.
-     */
-    std::vector<int> chessNotationToIndex(const std::string& notation);
 
 };
 
