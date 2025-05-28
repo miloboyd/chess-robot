@@ -137,26 +137,13 @@ bool RobotControl::executeCartesianPath(const std::vector<geometry_msgs::msg::Po
     move_group_ptr_->setGoalPositionTolerance(0.005);    // 5mm position tolerance
     move_group_ptr_->setGoalOrientationTolerance(0.1);   // ~6 degree orientation tolerance
     
-    //started of Liam's 11th hour code
-    rclcpp::Rate rate(10); // 10Hz check loop
-    std::future<moveit::core::MoveItErrorCode> result_future = 
-      std::async(std::launch::async, [this, &trajectory]() {
-        auto result = move_group_ptr_->execute(trajectory);
-      });
 
-    while (result_future.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
-      if (safety_manager_->isEstopTriggered()) {
-    //if (safety_manager_->isSafeToOperate()) { listens to DMS as well - both kill move
-        RCLCPP_ERROR(node_->get_logger(), "E-STOP: Stopping motion during cartesian path");
-        move_group_ptr_->stop(); // Stop robot safely
-        return false;
-      }
-      rate.sleep();
-    }
+    //if (!safety_manager_->isEstopTriggered()) {
+      auto result = move_group_ptr_->execute(trajectory);
+      RCLCPP_INFO(node_->get_logger(), "Executing cartesian path with relaxed tolerances");
+    //} else {
 
-    //end of Liam's 11th hour code
-    // RCLCPP_INFO(node_->get_logger(), "Executing cartesian path with relaxed tolerances");
-    // auto result = move_group_ptr_->execute(trajectory);
+    //}
     
     if (result == moveit::core::MoveItErrorCode::SUCCESS) {
       RCLCPP_INFO(node_->get_logger(), "Cartesian execution successful!");

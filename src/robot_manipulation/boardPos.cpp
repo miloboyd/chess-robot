@@ -13,13 +13,17 @@ void BoardPos::initialiseBoard() {
         int file = i / 8; //files are columns
         int rank = i % 8; //ranks are rows 
 
+        int flipped_file = 7 - file; // H=0, G=1, ..., A=7
+        int flipped_rank = 7 - rank; // 8=0, 7=1, ..., 1=7
+
         //X: Board spans -150 to +150mm, square centers at odd values
-        board[i].position.x = (-0.15 + 0.01875) + 0.0375 * (file);
+        board[i].position.x = (-0.15 + 0.01875) + 0.0375 * (flipped_file);
         //Y: Board spans 200 to 500mm, square centers at odd values  
-        board[i].position.y = (0.13 + 0.01875) + 0.0375 * (rank); 
+        board[i].position.y = (0.13 + 0.01875) + 0.0375 * (flipped_rank); 
         board[i].position.z = 0.047;
     }
 }
+
 
 void BoardPos::initialiseCapturedBoards() {
     for (int i = 0; i < 16; i++) {
@@ -83,6 +87,8 @@ std::vector<int> BoardPos::chessNotationToIndex(const std::string& notation) {
 
     return {firstIndex, secondIndex, taken};
 }
+
+
 
 BoardPos::Position3D BoardPos::getCapturedPiecePosition() {
     // Your existing logic for finding empty captured piece slot

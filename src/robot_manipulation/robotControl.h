@@ -21,6 +21,8 @@
 #include <atomic>
 #include <vector>
 
+#include "safetyManager.h"
+
 
 
 class RobotControl {
