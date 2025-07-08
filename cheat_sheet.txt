@@ -10,3 +10,5 @@ ros2 service call ur3/start_signal std_srvs/srv/Trigger
 turn finished topic message
 ros2 topic pub --once /move_complete std_msgs/Bool '{data: True}'
 
+publish movement command 
+ros2 topic pub --once /send_move std_msgs/msg/String "{data: 'a1c30'}"

@@ -1,29 +1,29 @@
-#include "main.h"
+#include "main_tester.h"
 #include "boardPos.h"
 #include "robotControl.h"
 
+//find joint arms for all of the grid positions
 
-//Creating a ROS 2 node with the name "chess_robot_node"
-Main::Main() : Node("chess_robot_node") {
+MainTest::MainTest() : Node("chess_robot_node") {
   RCLCPP_INFO(this->get_logger(), "Initializing Chess Robot Node");
 
   //robot_control_ = std::make_unique<RobotControl>(shared_from_this());
   board_pos_ = std::make_unique<BoardPos>();
 
-  //define service server that listens for a request to start the game
+  //create service
   start_game_service_ = this->create_service<std_srvs::srv::Trigger>(
     "ur3/start_signal", 
-    std::bind(&Main::startGameCallback, this, 
+    std::bind(&MainTest::startGameCallback, this, 
              std::placeholders::_1, std::placeholders::_2)
   );
 
-  //create subscriber to receive movement message  
+  //create subscriber 
   ai_move_subscriber_ = this->create_subscription<std_msgs::msg::String>(
       "/send_move", 10,
-      std::bind(&Main::aiMoveCallback, this, std::placeholders::_1)
+      std::bind(&MainTest::aiMoveCallback, this, std::placeholders::_1)
   );
 
-  // Create publisher to indicate if the robot has completed the move
+  // Create publisher
   move_complete_publisher_ = this->create_publisher<std_msgs::msg::Bool>(
       "/move_complete", 10);
   
@@ -31,10 +31,10 @@ Main::Main() : Node("chess_robot_node") {
 
 }
 
-void Main::run() {
+void MainTest::run() {
   
-  //make safety manager
-  safety_manager_ = std::make_unique<SafetyManager>(shared_from_this());
+//   //make safety manager
+//   safety_manager_ = std::make_unique<SafetyManager>(shared_from_this());
 
   // Initialize robot (separate from constructor to handle MoveIt timing issues)
   robot_control_ = std::make_unique<RobotControl>(shared_from_this(), safety_manager_.get());
@@ -45,15 +45,15 @@ void Main::run() {
       return;
   }
 
+  //executeMove();
   
+//   // Create GUI in main thread (Qt requirement)
+//   RCLCPP_INFO(this->get_logger(), "Creating GUI in main thread");
+//   GUI_ = std::make_unique<GUI>(shared_from_this());
+//   GUI_->show();
+//   RCLCPP_INFO(this->get_logger(), "GUI shown");
   
-  // Create GUI in main thread (Qt requirement)
-  RCLCPP_INFO(this->get_logger(), "Creating GUI in main thread");
-  GUI_ = std::make_unique<GUI>(shared_from_this());
-  GUI_->show();
-  RCLCPP_INFO(this->get_logger(), "GUI shown");
-  
-  RCLCPP_INFO(this->get_logger(), "Chess Robot ready - waiting for game start service call");
+//   RCLCPP_INFO(this->get_logger(), "Chess Robot ready - waiting for game start service call");
   
   // Use MultiThreadedExecutor to handle ROS2 callbacks in background threads
   rclcpp::executors::MultiThreadedExecutor executor;
@@ -83,7 +83,7 @@ void Main::run() {
   RCLCPP_INFO(this->get_logger(), "Application shutdown complete");
 }
 
-bool Main::initialiseRobot() {
+bool MainTest::initialiseRobot() {
   RCLCPP_INFO(this->get_logger(), "Initializing robot controller...");
   
   // Allow time for node to be fully established (fixes your MoveIt timing issue)
@@ -98,7 +98,7 @@ bool Main::initialiseRobot() {
 }
 
 // Service callback implementation
-void Main::startGameCallback(
+void MainTest::startGameCallback(
   const std::shared_ptr<std_srvs::srv::Trigger::Request> request,
   std::shared_ptr<std_srvs::srv::Trigger::Response> response) {
   
@@ -113,7 +113,7 @@ void Main::startGameCallback(
 }
 
 // Subscriber callback implementations
-void Main::aiMoveCallback(const std_msgs::msg::String::SharedPtr msg) {
+void MainTest::aiMoveCallback(const std_msgs::msg::String::SharedPtr msg) {
 
   if (!game_active_) {
     RCLCPP_WARN(this->get_logger(), "Received move but game not started");
@@ -140,7 +140,7 @@ void Main::aiMoveCallback(const std_msgs::msg::String::SharedPtr msg) {
 }
 
 // Move execution implementation
-bool Main::executeMove(const std::string& notation) {
+bool MainTest::executeMove(const std::string& notation) {
   RCLCPP_INFO(this->get_logger(), "Executing move: %s", notation.c_str());
 
   std::vector<int> result = board_pos_->chessNotationToIndex(notation);
@@ -158,17 +158,6 @@ bool Main::executeMove(const std::string& notation) {
   auto opponentPos = board_pos_->getBoardPosition(secondPos);
 
   robot_control_->moveBoard();
-
-  for (int i = 63; i > -1; i--) {
-
-    auto temp = board_pos_->getBoardPosition(i);
-    //move to each consecutive grid piece, and record the joint values. in this way, we can find how to get to them immediately.
-    //RCLCPP_INFO(this->get_logger(), "Moving to Index: %d", i);
-    std::cout << "Moving to Index: " << i << std::endl;
-    robot_control_->moveLinear(temp.x,temp.y,temp.z);
-
-
-  }
   
   // Execute the planned move sequence
   if (occupied) {
@@ -205,7 +194,7 @@ return true;
 }
 
 // Utility methods
-void Main::publishMoveComplete(bool success) {
+void MainTest::publishMoveComplete(bool success) {
   auto msg = std_msgs::msg::Bool();
   msg.data = success;
   move_complete_publisher_->publish(msg);

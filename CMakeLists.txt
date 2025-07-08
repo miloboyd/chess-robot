@@ -82,6 +82,7 @@ target_link_libraries(gui
 add_executable(chess_robot
   src/robot_manipulation/chess_main.cpp
   src/robot_manipulation/main.cpp
+  src/robot_manipulation/main_tester.cpp
   src/robot_manipulation/robotControl.cpp
   src/robot_manipulation/boardPos.cpp
   src/robot_manipulation/safetyManager.cpp
