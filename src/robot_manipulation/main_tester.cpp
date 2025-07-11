@@ -124,7 +124,7 @@ void MainTest::aiMoveCallback(const std_msgs::msg::String::SharedPtr msg) {
   
   // Execute move in separate thread to not block ROS2 callbacks
   std::thread([this, move = msg->data]() {
-      robot_control_->moveBoard();
+      //robot_control_->moveBoard();
       bool success = executeMove(move);
       //robot_control_->moveHome();
       publishMoveComplete(false);
@@ -157,7 +157,7 @@ bool MainTest::executeMove(const std::string& notation) {
   auto startPos = board_pos_->getBoardPosition(firstPos); 
   auto opponentPos = board_pos_->getBoardPosition(secondPos);
 
-  robot_control_->moveBoard();
+  //robot_control_->moveBoard();
   
   // Execute the planned move sequence
   if (occupied) {
@@ -165,10 +165,11 @@ bool MainTest::executeMove(const std::string& notation) {
     //move opponent piece to black captured piece
     std::cout << "Moving captured white piece to white captured board" << std::endl;
     
-
+    auto capturedJointValue = board_pos_->getJointValue(secondPos);
+    robot_control_->moveBoard(capturedJointValue);
 
     //proceed with movement 
-    robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
+    //robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
     robot_control_->pickUpPiece();
     robot_control_->moveLinear(capturedPos.x,capturedPos.y,capturedPos.z);
     robot_control_->placePiece();
@@ -181,8 +182,11 @@ if (board_pos_->isPawnPromotion(secondPos)) {
     //when pulling piece, remove taken piece type 
 }
 
+auto jointValue = board_pos_->getJointValue(firstPos);
+robot_control_->moveBoard(jointValue);
+
 //move main piece 
-robot_control_->moveLinear(startPos.x,startPos.y,startPos.z);
+//robot_control_->moveLinear(startPos.x,startPos.y,startPos.z);
 robot_control_->pickUpPiece();
 robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
 robot_control_->placePiece();

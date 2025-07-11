@@ -64,7 +64,7 @@ public:
     /**
      * @brief Moves to hardcorded setup position in preparation for chess piece manipulation.
      */
-    bool moveBoard();
+    bool moveBoard(std::array<double, 6> jointValue);
 
     /**
      * @brief Moves to the initial home position to finish the robot turn. 

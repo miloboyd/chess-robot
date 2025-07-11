@@ -124,7 +124,7 @@ void Main::aiMoveCallback(const std_msgs::msg::String::SharedPtr msg) {
   
   // Execute move in separate thread to not block ROS2 callbacks
   std::thread([this, move = msg->data]() {
-      robot_control_->moveBoard();
+      //robot_control_->moveBoard();
       bool success = executeMove(move);
       //robot_control_->moveHome();
       publishMoveComplete(false);
@@ -148,17 +148,17 @@ bool Main::executeMove(const std::string& notation) {
       std::cerr << "Failed to parse chess notation" << std::endl;
       return false;
   }
-  
+  //two indexes
   int firstPos = result[0];
   int secondPos = result[1];
+  //whether piece capture is necessary
   bool occupied = result[2];
 
   auto capturedPos = board_pos_->getCapturedPiecePosition();
   auto startPos = board_pos_->getBoardPosition(firstPos); 
   auto opponentPos = board_pos_->getBoardPosition(secondPos);
 
-  robot_control_->moveBoard();
-
+  /**
   for (int i = 63; i > -1; i--) {
 
     auto temp = board_pos_->getBoardPosition(i);
@@ -168,18 +168,19 @@ bool Main::executeMove(const std::string& notation) {
     robot_control_->moveLinear(temp.x,temp.y,temp.z);
 
 
-  }
+  } */
   
   // Execute the planned move sequence
   if (occupied) {
 
     //move opponent piece to black captured piece
     std::cout << "Moving captured white piece to white captured board" << std::endl;
+
+    auto capturedJointValue = board_pos_->getJointValue(secondPos);
+    robot_control_->moveBoard(capturedJointValue);
     
-
-
     //proceed with movement 
-    robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
+    //robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
     robot_control_->pickUpPiece();
     robot_control_->moveLinear(capturedPos.x,capturedPos.y,capturedPos.z);
     robot_control_->placePiece();
@@ -192,8 +193,11 @@ if (board_pos_->isPawnPromotion(secondPos)) {
     //when pulling piece, remove taken piece type 
 }
 
+auto jointValue = board_pos_->getJointValue(firstPos);
+robot_control_->moveBoard(jointValue);
+
 //move main piece 
-robot_control_->moveLinear(startPos.x,startPos.y,startPos.z);
+//robot_control_->moveLinear(startPos.x,startPos.y,startPos.z);
 robot_control_->pickUpPiece();
 robot_control_->moveLinear(opponentPos.x,opponentPos.y,opponentPos.z);
 robot_control_->placePiece();

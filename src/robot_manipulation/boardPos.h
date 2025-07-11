@@ -58,6 +58,10 @@ public:
         double z; ///< Z-coordinate or height in the robot's workspace (in meters)
     };
 
+    struct JointValues {
+        std::array<double, 6> joints;
+    };
+
     /**
      * @brief Checks for pawn promotion instance.
      * 
@@ -82,11 +86,13 @@ public:
 
     Position3D getCapturedPiecePosition();
     Position3D getBoardPosition(int index);
+    std::array<double, 6> getJointValue(int index);
 
 private:
 
     struct Square {
         Position3D position; ///< 3D position of this chess square in the robot's workspace
+        JointValues jointValues;
     };
 
     struct CapturedSquare {
