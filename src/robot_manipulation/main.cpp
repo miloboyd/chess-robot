@@ -158,17 +158,19 @@ bool Main::executeMove(const std::string& notation) {
   auto startPos = board_pos_->getBoardPosition(firstPos); 
   auto opponentPos = board_pos_->getBoardPosition(secondPos);
 
-  /**
-  for (int i = 63; i > -1; i--) {
+  // auto capturedJointValue = board_pos_->getJointValue(secondPos);
+  // robot_control_->moveBoard(capturedJointValue);
+  
+  // for (int i = 63; i > -1; i--) {
 
-    auto temp = board_pos_->getBoardPosition(i);
-    //move to each consecutive grid piece, and record the joint values. in this way, we can find how to get to them immediately.
-    //RCLCPP_INFO(this->get_logger(), "Moving to Index: %d", i);
-    std::cout << "Moving to Index: " << i << std::endl;
-    robot_control_->moveLinear(temp.x,temp.y,temp.z);
+  //   auto temp = board_pos_->getBoardPosition(i);
+  //   //move to each consecutive grid piece, and record the joint values. in this way, we can find how to get to them immediately.
+  //   //RCLCPP_INFO(this->get_logger(), "Moving to Index: %d", i);
+  //   std::cout << "Moving to Index: " << i << std::endl;
+  //   robot_control_->moveLinear(temp.x,temp.y,temp.z);
 
 
-  } */
+  // }
   
   // Execute the planned move sequence
   if (occupied) {

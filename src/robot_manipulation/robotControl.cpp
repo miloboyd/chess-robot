@@ -53,8 +53,8 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
   geometry_msgs::msg::Pose current_pose = move_group_ptr_->getCurrentPose().pose;
   geometry_msgs::msg::Quaternion locked_orientation = current_pose.orientation; // Define locked_orientation
 
-  // RCLCPP_INFO(node_->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
-  //             current_pose.position.x, current_pose.position.y, current_pose.position.z);
+  //RCLCPP_INFO(node_->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+  //            current_pose.position.x, current_pose.position.y, current_pose.position.z);
 
 
   //std::vector<double> joint_values = move_group_ptr_->getCurrentJointValues();
@@ -72,7 +72,7 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
   double dy = target_y - current_pose.position.y;
   double dz = target_z - current_pose.position.z;
   double total_distance = sqrt(dx*dx + dy*dy + dz*dz);
-  RCLCPP_INFO(node_->get_logger(), "Chess move: %.1fcm distance", total_distance * 100);
+  //RCLCPP_INFO(node_->get_logger(), "Chess move: %.1fcm distance", total_distance * 100);
 
   std::vector<geometry_msgs::msg::Pose> waypoints;
 
@@ -80,7 +80,7 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
     
     const double step_size = 0.03;
     int num_steps = ceil(total_distance / step_size);
-    RCLCPP_INFO(node_->get_logger(), "Large movement: creating %d waypoints", num_steps);
+    //RCLCPP_INFO(node_->get_logger(), "Large movement: creating %d waypoints", num_steps);
 
     // Add intermediate waypoints
     for (int i = 1; i <= num_steps; i++) {
@@ -104,7 +104,7 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
     target_pose.orientation = locked_orientation; //preserve orientation;  // Same orientation for all waypoints
 
     waypoints.push_back(target_pose);
-    RCLCPP_INFO(node_->get_logger(), "Small movement: single waypoint");
+    //RCLCPP_INFO(node_->get_logger(), "Small movement: single waypoint");
   }
 
   bool success = executeCartesianPath(waypoints);
@@ -118,8 +118,13 @@ bool RobotControl::moveLinear(double target_x, double target_y, double target_z)
     success = executeJointSpacePlan(final_target);
   } 
 
+  geometry_msgs::msg::Pose final_pose = move_group_ptr_->getCurrentPose().pose;
+
+  //RCLCPP_INFO(node_->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+  //            final_pose.position.x, final_pose.position.y, final_pose.position.z);
+
   std::vector<double> joint_values = move_group_ptr_->getCurrentJointValues();
-  std::cout << "(" << joint_values[0] << "," << joint_values[1] << "," << joint_values[2] << "," << joint_values[3] << "," << joint_values[4] << "," << joint_values[5] << std::endl;
+  std::cout << "{{" << joint_values[0] << "," << joint_values[1] << "," << joint_values[2] << "," << joint_values[3] << "," << joint_values[4] << "," << joint_values[5] << "}}" << std::endl;
 
   return success;
 }
@@ -155,7 +160,7 @@ bool RobotControl::executeCartesianPath(const std::vector<geometry_msgs::msg::Po
 
     //if (!safety_manager_->isEstopTriggered()) {
       auto result = move_group_ptr_->execute(trajectory);
-      RCLCPP_INFO(node_->get_logger(), "Executing cartesian path with relaxed tolerances");
+      //RCLCPP_INFO(node_->get_logger(), "Executing cartesian path with relaxed tolerances");
     //} else {
 
     //}
@@ -278,8 +283,13 @@ bool RobotControl::moveBoard(std::array<double, 6> jointValue) {
 
   //move arm to position
   move_group_ptr_->setJointValueTarget(std::vector<double>(jointValue.begin(),jointValue.end()));
+  //move_group_ptr_->setJointValueTarget(set_position);
   move_group_ptr_->move();
   RCLCPP_INFO(node_->get_logger(), "Moved to setup position!");
+
+  //geometry_msgs::msg::Pose current_pose = move_group_ptr_->getCurrentPose().pose;
+  //RCLCPP_INFO(node_->get_logger(), "Current position: (%.3f, %.3f, %.3f)", 
+  //            current_pose.position.x, current_pose.position.y, current_pose.position.z);
 
   return true;
 }
