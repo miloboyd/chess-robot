@@ -1,55 +1,23 @@
-rs2 pick and place robotics project
+# Chess Robot
 
-How to run the game:
+An autonomous chess system featuring a robotic arm to play a competitive match against a human opponent. 
 
-    ros2 run rs2 chess_core.py
+## Project Overview
 
-    this will launch the game, initialise the board and start the game with the player being white.
-    it is currently configured in sim mode which doesn't use camera inputs for piece detection, insead the user
-    must manually enter the piece positions using a gui. click the squares to toggle between white, black and empty.
-    
-    If not using robot yet.
-    the code will wait for a response from the robot indicating that it has completed its move, if you don't have the robot
-    working then send this command to a terminal window and the code will progress.
+This project implements an autonomous chess-playing system using a UR3e robotic arm equipped with an RG2 gripper. Leveraging ROS 2, MoveIt and vision-based feedback, the robot plays full games of chess against a human opponent. The robot identifies piece positions, plans its moves, and executes them through precise manipulation, while maintaining safe and reliable motion within the workspace. 
 
-    ros2 topic pub --once /move_complete std_msgs/Bool '{data: true}'
+### Key Features
 
-    you will then need to manually enter the new piece positon as entered by the ai in the CLI as camera is diabled.
+- **UR3e Arm + RG2 Gripper** integration for precise manipulation
+- **Real-time chess logic** using stockfish for legal move handling
+- **MoveIt** for safe and smooth pick-and-place path planning
+- **Vision system** for identifying board state and validating piece positions
+- **Modular codebase** with separate nodes for perception, planning, and execution
 
-    the program will then loop until game finished.
+### Demo
 
-Robot node requirements:
+Watch the UR3e robot play a snippet of chess autonomously:
 
-    The Chess_core node will send the AI move to the /send_move topic in the format of {starting COORD Finish COORD goal occupied} {eg e2e40}
-    it will then wait for a response in the /move_complete topic of true to indicate that the robot has stopped moving.
+[Robot playing chess](https://youtube.com/shorts/CKr70euElMs?feature=share)
 
-Camera integration:
-    the camera has not been tested yet and therefore has not been fully integrated. I will include instructions on how to use it once it is tested.
-    Eventually it will be toggled on using a rosarg.
-
-
-Equipment Included
-4x chessboard quadrants
-16x custom white chess pieces
-16x custom black chess pieces
-1x alignment board
-
-Board Setup:
-Place alignment board on the surface of the UR3e bench with corners aligned for future measurements. 
-Place all 4 quadrants on the alignment board. Ensure markings below the board follow order so the board is fitted correctly.
-Place white chess pieces on board ensuring the Queen is placed on white grid.
-Repeat step 3 for black pieces ensuring the black Queen is placed on the black grid.
-
-
-
-Ai Subsystem
-
-Overview:
-The Ai subsystem is responsible for interpreting the chessboard state and generating optimal moves for the robot using the Stockfish chess engine. This module receives FEN strings from the vision subsystem, processes them and returns a valid move in under two seconds.
-
-Inputs and Outputs:
-Input: FEN string (Forsyth-Edwards Notation) from the vision system (Sean’s Subsystem)
-
-Process: Stockfish generates the best move based on the current board state
-
-Output: Valid move in algebraic notation -> passed to the robot manipulation subsystem (Milo’s subsystem)
+[Robot playing chess](https://youtube.com/shorts/n04GHHTmyB4?feature=share)
